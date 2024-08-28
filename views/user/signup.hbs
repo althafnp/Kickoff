@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #fff;
+            color: #000;
+        }
+        .card {
+            background-color: #f8f9fa;
+            border: none;
+            width: 375px;
+        }
+        .form-control {
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            color: #000;
+        }
+        .form-control:focus {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+            color: #000;
+        }
+        .btn-primary {
+            background-color: #000;
+            color: #fff;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #333;
+        }
+        .btn-google {
+            background-color: #dd4b39;
+            color: #fff;
+            border: none;
+        }
+        .btn-google:hover {
+            background-color: #c23321;
+        }
+        .logo {
+            width: 100px;
+            height: auto;
+        }
+        .text-dark-gray {
+            color: #000000;
+        }
+        .error-message{
+            color: red;
+            font-size: 0.75rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card p-4 shadow-lg">
+            <div class="text-center">
+                <img src="/images/logo.png" alt="Logo" class="logo mb-4">
+                <h2>Sign Up</h2>
+            </div>
+            {{#if message}}
+            <div class="alert alert-danger text-center">
+                {{message}}
+            </div>
+            {{/if}}
+            <form id="sign-form" action="/auth/signup" method="POST">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" name="name" id="name" placeholder="Enter your name">
+                    <div class="error-message" id="error1"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" name="email" id="email" placeholder="Enter your email">
+                    <div class="error-message" id="error2"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" name="password" id="password" placeholder="Enter your password">
+                    <div class="error-message" id="error3"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="confirmpassword" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" name="confirmPassword" id="confirm-password" placeholder="Confirm your password">
+                    <div class="error-message" id="error4"></div>
+                </div>
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                </div>
+                <div class="d-grid mb-3">
+                    <a href="/auth/google" class="btn btn-google">
+                        <i class="fab fa-google me-2"></i> Sign Up with Google
+                    </a>
+                </div>
+                <div class="text-center">
+                    <p class="text-dark-gray">Already have an account? <a href="/auth/login" class="text-dark">Login here</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{!-- <script src="/javascript/signupValidate.js"></script> --}}
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const nameId = document.getElementById('name');
+        const emailId = document.getElementById('email');
+        const passId = document.getElementById('password');
+        const confirmPassId = document.getElementById('confirm-password');
+
+        const error1 = document.getElementById('error1');
+        const error2 = document.getElementById('error2');
+        const error3 = document.getElementById('error3');
+        const error4 = document.getElementById('error4');
+
+        const signForm = document.getElementById('sign-form');
+
+        if (!nameId || !emailId || !passId || !confirmPassId || !error1 || !error2 || !error3 || !error4 || !signForm) {
+            console.log('One or more elements not found');
+            return; // Exit early if any element is missing
+        }
+
+        function nameValidateChecking() {
+            const nameVal = nameId.value.trim();
+            const namePattern = /^[a-zA-Z\s]+$/;
+
+            if (nameVal === '') {
+                error1.style.display = 'block';
+                error1.innerHTML = 'Please Enter a Valid Name';
+            } else if (!namePattern.test(nameVal)) {
+                error1.style.display = 'block';
+                error1.innerHTML = 'Name can only contain alphabets and spaces';
+            } else {
+                error1.style.display = 'none';
+                error1.innerHTML = '';
+            }
+        }
+
+        function emailValidateChecking() {
+            const emailVal = emailId.value.trim();
+            const emailPattern = /^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+            if (!emailPattern.test(emailVal)) {
+                error2.style.display = 'block';
+                error2.innerHTML = 'Invalid email format';
+            } else {
+                error2.style.display = 'none';
+                error2.innerHTML = '';
+            }
+        }
+
+        function passValidateChecking() {
+            const passVal = passId.value.trim();
+            const confirmPassVal = confirmPassId.value.trim();
+            const alpha = /[a-zA-Z]/;
+            const digit = /\d/;
+
+            if (passVal.length < 8) {
+                error3.style.display = 'block';
+                error3.innerHTML = 'Should contain at least 8 characters';
+            } else if (!alpha.test(passVal) || !digit.test(passVal)) {
+                error3.style.display = 'block';
+                error3.innerHTML = 'Should contain numbers and alphabets';
+            } else {
+                error3.style.display = 'none';
+                error3.innerHTML = '';
+            }
+
+            if (passVal !== confirmPassVal) {
+                error4.style.display = 'block';
+                error4.innerHTML = 'Password does not match';
+            } else {
+                error4.style.display = 'none';
+                error4.innerHTML = '';
+            }
+        }
+
+        signForm.addEventListener('submit', function (e) {
+            nameValidateChecking();
+            emailValidateChecking();
+            passValidateChecking();
+
+            if (error1.innerHTML || error2.innerHTML || error3.innerHTML || error4.innerHTML) {
+                e.preventDefault(); // Prevent form submission if there are errors
+            }
+        });
+    });
+
+    </script>
+
+</body>
+<html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // const nameId = document.getElementById('name');
+// const emailId = document.getElementById('email');
+// const passId = document.getElementById('password');
+// const confirmPassId = document.getElementById('confirm-password')
+
+// const error1 = document.getElementById('error1')
+// const error2 = document.getElementById('error2')
+// const error3 = document.getElementById('error3')
+// const error4 = document.getElementById('error4')
+
+// const signForm = document.getElementById('sign-form')
+
+
+// function nameValidateChecking(e) {
+//     const nameVal = nameId.value;
+//     const namePattern = /^[a-zA-Z\s]+$/;
+
+//     if (nameVal.trim() === '') {
+//         error1.style.display = 'block';
+//         error1.innerHTML = 'Please Enter a Valid Name';
+//     }
+//     else if (!namePattern.test(nameVal)) {
+//         error1.style.display = 'block';
+//         error1.innerHTML = 'Name can only contain alphabets and spaces';
+//     }
+//     else {
+//         error1.style.display = 'none';
+//         error1.innerHTML = '';
+//     }
+// };
+
+
+// function emailValidateChecking(e) {
+//     const emailVal = emailId.value;
+//     const emailPattern = /^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+//     if (!emailPattern.test(emailval)) {
+//         error2.style.display = 'block';
+//         error2.innerHTML = 'Invalid format';
+//     }
+//     else {
+//         error2.style.display = 'none';
+//         error2.innerHTML = '';
+//     }
+// };
+
+
+// function passValidateChecking(e) {
+//     const passVal = passId.value;
+//     const confirmPassVal = confirmPassId.value;
+//     const alpha = /[a-zA-Z]/;
+//     const digit = /\d/;
+
+//     if (passVal.length < 8) {
+//         error3.style.display = 'block';
+//         error3.innerHTML = 'Should contain atleast 8 characters';
+//     }
+//     else if (!alpha.test(passVal) || !digit.test(passVal)) {
+//         error3.style.display = 'block';
+//         error3.innerHTML = 'Should contain numbers and alphabets';
+//     }
+//     else {
+//         error3.style.display = 'none';
+//         error3.innerHTML = '';
+//     };
+
+
+//     if (passVal != confirmPassVal) {
+//         error4.style.display = 'block';
+//         error4.innerHTML = 'Password does not match'
+//     } else {
+//         error4.style.display = 'none';
+//         error4.innerHTML = '';
+//     }
+// }
+
+
+// document.addEventListener('DOMContentLoaded', function () {
+//     signForm.addEventListener('submit', function (e) {
+
+//         nameValidateChecking();
+//         emailValidateChecking();
+//         passValidateChecking();
+
+//         if (!nameId || !emailId || !passId || !error1 || !error2 || !error3 || !error4 || !signForm) {
+//             console.error('One or more elements not found', error)
+//         };
+
+//         if (error1.innerHTML || error2.innerHTML || error3.innerHTML || error4.innerHTML) {
+//             e.preventDefault();
+//         }
+//     })
+// })
+
+
+
