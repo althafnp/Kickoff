@@ -10,44 +10,61 @@
 </div>
 
 <header class="card-header text-center mb-20">
-    <form action="/admin/users/" method="get" class="d-inline">
-        <div class="input-group input-group-sm border border-1 border-grey rounded-pill"
-            style="width: 500px; margin-left: 230px;">
-            <input type="text" class="form-control border-0 rounded-pill" placeholder="Search customers..."
-                name="search">
-            <button class="btn  border-0" type="submit">Search</button>
+    <form action="/admin/users" method="get" class="d-inline">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+              <div class="input-group input-group-sm border border-1 border-grey rounded-pill">
+                <input type="text" class="form-control border-0 rounded-pill" placeholder="Search Users" name="search"/>
+                <button class="btn" type="submit">Search</button>
+              </div>
+            </div>
+          </div>
         </div>
     </form>
 </header>
 <div class="right mt-5">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col"><b>Name</b></th>
-                <th scope="col"><b>Email</b></th>
-                <th scope="col"><b>Action</b></th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each userData}}
-            <tr>
-                <td>{{name}}</td>
-                <td>{{email}}</td>
-                <td>
-                    {{#if isBlocked}}
-                    <button class="btn btn-success" style="width: 80px;">
-                        <a href="/admin/users/unblockUser?id={{_id}}" class="text-white" style="text-decoration: none;">Unblock</a>
-                    </button>
-                    {{else}}
-                    <button class="btn btn-danger" style="width: 80px;">
-                        <a href="/admin/users/blockUser?id={{_id}}" class="text-white" style="text-decoration: none;">Block</a>
-                    </button>
-                    {{/if}}
-                </td>
-            </tr>
-            {{/each}}
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col"><b>Id</b></th>
+                    <th scope="col"><b>Name</b></th>
+                    <th scope="col"><b>Email</b></th>
+                    <th scope="col"><b>Status</b></th>
+                    <th scope="col"><b>Action</b></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each userData}}
+                <tr>
+                    <td>{{_id}}</td>
+                    <td>{{name}}</td>
+                    <td>{{email}}</td>
+                    <td>
+                        {{#if isBlocked}}
+                        <p class="text text-danger">Blocked</p>
+                        {{else}}
+                        <p class="text text-success">Active</p>
+                        {{/if}}
+                    </td>
+                    <td>
+                        {{#if isBlocked}}
+                        <a href="/admin/users/unblockUser?id={{_id}}" class="text-white" style="text-decoration: none;">
+                            <button class="btn btn-success" style="width: 80px;">Unblock</button>
+                        </a>
+                        
+                        {{else}}
+                        <a href="/admin/users/blockUser?id={{_id}}" class="text-white" style="text-decoration: none;">
+                            <button class="btn btn-danger" style="width: 80px;">Block</button>
+                        </a>
+                        {{/if}}
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
 </div>
 <div class="container mt-3">
     <nav aria-label="Page navigation">

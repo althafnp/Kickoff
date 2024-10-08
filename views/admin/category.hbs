@@ -1,0 +1,324 @@
+{{> admin/header}}
+
+
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css"/>
+  <style>
+    .col-md-3 {
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin: 10px;
+    }
+
+    .form-label {
+      margin-bottom: 8px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    .d-grid {
+      margin-top: 20px;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      color: #fff;
+      border: 1px solid #007bff;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+
+    .pagination-container {
+      text-align: center;
+    }
+
+    .pagination {
+      display: inline-block;
+    }
+
+    .pagination a,
+    .pagination .current-page {
+      display: inline-block;
+      padding: 5px 10px;
+      margin: 0 2px;
+      border: 1px solid #ddd;
+      text-decoration: none;
+      color: #333;
+    }
+
+    .pagination a:hover {
+      background-color: #f5f5f5;
+    }
+
+    .error-message {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <section class="content-main">
+    <div class="content-header">
+      <div>
+        <h2 class="content-title card-title">Category</h2>
+      </div>
+    </div>
+    <header class="card-header text-center mb-20">
+      <form action="/admin/category/" method="get" class="d-inline">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+              <div class="input-group input-group-sm border border-1 border-grey rounded-pill">
+                <input type="text" class="form-control border-0 rounded-pill" placeholder="Search categories" name="search"/>
+                <button class="btn" type="submit">Search</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </header>
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3">
+            <form id="addCategoryForm">
+              <div class="mb-4">
+                <label for="categoryId" class="form-label">Category Type</label>
+                <input type="text" name="categoryType" placeholder="Type here" class="form-control" id="categoryId" required/>
+                <div id="name-error" class="error-message"></div>
+              </div>
+              <div class="mb-4">
+                <label class="form-label">Name</label>
+                <input type="text" placeholder="Type here" name="name" class="form-control" id="nameId" required>
+                <div id="description-error" class="error-message"></div>
+              </div>
+              <div class="d-grid">
+                <button class="btn btn-primary" type="submit">
+                  Create category
+                </button>
+              </div>
+            </form>
+          </div>
+          <div class="col-md-8 ml-10">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Name</th>
+                    <th>Category Status</th>
+                    <th>Category List/Unlist</th>
+                    <th class="text-start">Edit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{#each categories}}
+                  <tr>
+
+                    <td class="text-start">{{categoryType}}</td>
+
+                    <td class="text-start">{{name}}</td>
+
+
+                    <td class="text-start">
+                      {{#if isListed}}
+                      <span class="badge rounded-pill alert-success" style="width: 60px; color: green">Listed</span>
+                      {{else}}
+                      <span class="badge rounded-pill alert-danger" style="width: 60px; color: red">Unlisted</span>
+                      {{/if}}
+                    </td>
+
+                    <td class="text-start">
+                      {{#if isListed}}
+                      <button class="btn btn-danger text-white unlist-btn" data-id="{{_id}}" style="width: 50px; padding:2px; font-size: x-small;">
+                        Unlist
+                      </button>
+                      {{else}}
+                      <button class="btn btn-success text-white list-btn" data-id="{{_id}}" style="width: 50px; padding:2px; font-size: x-small;">
+                        List
+                      </button>
+                      {{/if}}
+                    </td>
+
+                    <td class="text-start">
+                      <a href="/admin/category/editCategory/{{_id}}" class="btn btn-info text-white" style="">Edit</a>
+                    </td>
+
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pagination-container">
+      {{#if (gt currentPage 1)}}
+        <a href="?page={{subtract currentPage 1}}">&laquo; Previous</a>
+      {{/if}}
+
+      {{#each (range 1 totalPages)}}
+        {{#if (eq this currentPage)}}
+          <span class="current-page">{{this}}</span>
+        {{else}}
+          <a href="?page={{this}}">{{this}}</a>
+        {{/if}}
+      {{/each}}
+
+      {{#if (lt currentPage totalPages)}}
+        <a href="?page={{add currentPage 1}}">Next &raquo;</a>
+      {{/if}}
+    </div>
+  </section>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  
+  <script>
+    
+    $(document).ready(function() {
+      $('#addCategoryForm').submit(function(e) {
+        e.preventDefault();
+
+        const categoryType = $('#categoryId').val().trim();
+        const name = $('#nameId').val().trim();
+
+        // Client-side validation
+        if (!categoryType || !name) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Both fields are required!',
+          });
+          return;
+        }
+
+        $.ajax({
+          url: '/admin/category/addCategory',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ categoryType, name }),
+          success: function(response) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Category Added',
+              text: 'The category has been successfully added!',
+            }).then(() => {
+              // Optionally reset the form
+              $('#addCategoryForm')[0].reset();
+            });
+          },
+          error: function(xhr) {
+            const errorResponse = JSON.parse(xhr.responseText);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: errorResponse.error,
+            });
+          }
+        });
+      });
+    });
+
+
+    $(document).ready(function() {
+    // Handle listing the category
+    $('.list-btn').click(function() {
+      const categoryId = $(this).data('id');
+
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You want to list this category?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, list it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: `/admin/category/listCategory`,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ id: categoryId }),
+            success: function(response) {
+              Swal.fire(
+                'Listed!',
+                'The category has been listed.',
+                'success'
+              ).then(() => {
+                location.reload(); // Reload the page to reflect the change
+              });
+            },
+            error: function() {
+              Swal.fire(
+                'Error!',
+                'There was an error listing the category.',
+                'error'
+              );
+            }
+          });
+        }
+      });
+    });
+
+    // Handle unlisting the category
+    $('.unlist-btn').click(function() {
+      const categoryId = $(this).data('id');
+
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You want to unlist this category?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, unlist it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: `/admin/category/unlistCategory`,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ id: categoryId }),
+            success: function(response) {
+              Swal.fire(
+                'Unlisted!',
+                'The category has been unlisted.',
+                'success'
+              ).then(() => {
+                location.reload(); // Reload the page to reflect the change
+              });
+            },
+            error: function() {
+              Swal.fire(
+                'Error!',
+                'There was an error unlisting the category.',
+                'error'
+              );
+            }
+          });
+        }
+      });
+    });
+  });
+
+  </script>
+
+
+
+
+{{> admin/footer}}

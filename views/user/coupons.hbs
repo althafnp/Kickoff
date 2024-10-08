@@ -1,0 +1,57 @@
+{{> user/header}}
+
+
+
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Coupons</h4>
+                    <div class="breadcrumb__links">
+                        <a href="/">Home</a>
+                        <span>Coupons</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="order-history spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h4 style="margin-bottom: 2rem;">Available Coupons</h4>
+                <div class="order__table">
+                    <table style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th>Coupon Code</th>
+                                <th>Offer</th>
+                                <th>Minimum Price</th>
+                                <th>Maximum Price</th>
+                                <th>Valid Till</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each coupon}}
+                            <tr style="height: 3rem;">
+                                <td style="font-weight: bold;">{{code}}</td>
+                                <td style="color: green; font-weight: bold">{{couponOffer}}%</td>
+                                <td>{{minAmount}}</td>
+                                <td>{{maxAmount}}</td>
+                                <td>{{formatDate expireOn}}</td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+{{> user/footer}}

@@ -28,20 +28,20 @@ const productSchema = new Schema({
         type: Number,
         default: 0
     },
-    quantity:{
-        type: Number,
-        default: true
-    },
-    variant:[{
-        size:{
-            type: String,
-            required: true
-        },
-        stock:{
-            type: Number,
-            required: true
+    variant: [
+        {
+            size:{
+                type: String,
+                enum: ['S', 'M', 'L', 'XL'],
+                required: true
+            },
+            stock:{
+                type: Number,
+                required: true
+            }
+
         }
-    }],
+    ],
     productImage:{
         type: [String],
         required: true
@@ -49,10 +49,6 @@ const productSchema = new Schema({
     type:{
         type: String,
         enum: ['Home', 'Away'],
-        required: true
-    },
-    combo:{
-        type: Boolean,
         required: true
     },
     isBlocked:{
@@ -70,3 +66,27 @@ const productSchema = new Schema({
 
 const Product = mongoose.model('Product', productSchema);
 module.exports = Product;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// size:{
+//     type: String,
+//     required: true
+// },
+// stock:{
+//     type: Number,
+//     required: true
+// },

@@ -9,6 +9,11 @@ const orderSchema = new Schema({
         default: () => uuidv4(),
         unique: true
     },
+    userId :{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     orderedItems:[{
         product:{
             type: Schema.Types.ObjectId,
@@ -22,6 +27,10 @@ const orderSchema = new Schema({
         price:{
             type: Number,
             default: 0
+        },
+        size: {
+            type: String,
+            required: true
         }
     }],
     totalPrice:{
@@ -40,6 +49,37 @@ const orderSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Address',
         required: true
+    },
+    coupon:{
+        code:{
+            type: String,
+            default: null
+        },
+        offer:{
+            type: Number,
+            default: null
+        }
+    },
+    deliveryCharge:{
+        type: Number,
+        required: true
+    },
+    paymentMethod:{
+        type: String,
+        required: true,
+    },
+    paymentStatus:{
+        type: String,
+        default: 'Pending'
+    },
+    razorpayOrderId: {
+        type: String
+    },
+    razorpayPaymentId: {
+        type: String
+    },
+    razorpaySignature: {
+        type: String
     },
     invoiceDate:{
         type: Date

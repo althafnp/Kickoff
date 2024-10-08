@@ -1,0 +1,191 @@
+{{> user/header}}
+
+
+<style>
+    .custom-pro-qty {
+        display: flex;
+        align-items: center;
+    }
+
+    .custom-qtybtn {
+        background-color: #f0f0f0;
+        height: 28px;
+        padding: 0px 10px;
+        cursor: pointer;
+        font-size: 18px;
+        user-select: none;
+    }
+
+    .custom-qtybtn:hover {
+        background-color: #ddd;
+    }
+
+    .custom-cart-quantity {
+        width: 40px;
+        text-align: center;
+        border: 1px solid #ddd;
+        margin: 0 5px;
+    }
+    .toast-warning {
+    background-color: #ffc107 !important; /* Typical warning color */
+    color: #black !important; /* Text color */
+    }
+</style>
+
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Shopping Cart</h4>
+                    <div class="breadcrumb__links">
+                        <a href="/">Home</a>
+                        <a href="/shop">Shop</a>
+                        <span>Shopping Cart</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
+
+<!-- Shopping Cart Section Begin -->
+<section class="shopping-cart spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                {{#if message}}
+                <div style="margin-bottom: 10px">
+                    <h4 style="text-align: center; font-weight: bold; color: rgb(241, 45, 45)">{{message}}</h3>
+                </div>
+                {{else}}
+                <div class="shopping__cart__table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each items}}
+                            <tr>
+                                <td class="product__cart__item">
+                                    <div class="product__cart__item__pic" style="width: 5rem;">
+                                        <img src="/uploads/re-image/{{this.productId.productImage.[0]}}" alt="">
+                                    </div>
+                                    <div class="product__cart__item__text">
+                                        <h6>{{productId.productName}} - ({{size}})</h6>
+                                        <h6>₹ {{productId.salePrice}}</h6>
+                                    </div>
+                                </td>
+                                <td class="custom-quantity__item">
+                                    <div class="custom-quantity">
+                                        <div class="custom-pro-qty">
+                                            <span class="custom-dec custom-qtybtn" data-id="{{_id}}">-</span>
+                                            <input type="text" class="custom-cart-quantity" data-id="{{_id}}" min="1"
+                                                value="{{quantity}}">
+                                            <span class="custom-inc custom-qtybtn" data-id="{{_id}}">+</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="cart__price" data-id="{{_id}}">₹ {{totalPrice}}</td>
+                                <td class="cart__close">
+                                    <a href="/cart/remove/{{productId._id}}?size={{size}}" class="remove-item">
+                                        <i class="fa fa-close"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+                {{/if}}
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="continue__btn">
+                            <a href="/shop">Continue Shopping</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                {{#if items.length}}
+                <div class="cart__total">
+                    <a href="/checkout/{{cart._id}}" class="primary-btn" id="checkout">Proceed to checkout</a>
+                </div>
+                {{else}}
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Shopping Cart Section End -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+
+<script>
+
+
+    $(document).ready(function () {
+        // Increment button
+        $('.custom-inc').on('click', function () {
+            const input = $(this).siblings('.custom-cart-quantity');
+            let quantity = parseInt(input.val());
+            const itemId = input.data('id');
+
+            if(quantity < 10){
+                quantity++;
+                input.val(quantity);
+                updateCartQuantity(itemId, quantity); // Call the AJAX function to update the quantity in the backend
+            }else{
+                toastr.warning('Quantity is limited for 10')
+            }
+        });
+
+        // Decrement button
+        $('.custom-dec').on('click', function () {
+            const input = $(this).siblings('.custom-cart-quantity');
+            let quantity = parseInt(input.val());
+            const itemId = input.data('id');
+
+            if (quantity > 1) {
+                quantity--;
+                input.val(quantity);
+                updateCartQuantity(itemId, quantity); // Call the AJAX function to update the quantity in the backend
+            }
+        });
+
+        // Function to update cart quantity via AJAX
+        function updateCartQuantity(itemId, quantity) {
+            $.ajax({
+                url: '/cart/update-quantity',
+                method: 'POST',
+                data: {
+                    itemId: itemId,
+                    quantity: quantity
+                },
+                success: function (response) {
+                    if (response.success) {
+                        const totalPrice = response.newTotalPrice;
+                         $(`.cart__price[data-id="${itemId}"]`).text(`₹ ${totalPrice}`);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (error) {
+                    toastr.error('Error updating quantity');
+                }
+            });
+        }
+    });
+</script>
+
+
+{{> user/footer}}

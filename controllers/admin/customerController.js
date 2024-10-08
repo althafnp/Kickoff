@@ -15,7 +15,9 @@ const customerInfo = async (req, res) => {
         if(req.query.page){
             page = req.query.page;
         }
-        const limit = 3;
+        const limit = 5;
+
+        
 
         const userData = await User.find({
             isAdmin: false,
@@ -25,7 +27,7 @@ const customerInfo = async (req, res) => {
             ]
         })
         .limit(limit)
-        .skip((page - 1) * 3)
+        .skip((page - 1) * limit)
         .exec()
 
         const count = await User.find({
@@ -35,6 +37,8 @@ const customerInfo = async (req, res) => {
                 {email: {$regex: '.*' + search + '.*', $options: 'i'}}
             ]
         }).countDocuments();
+
+
 
 
         const totalPages = Math.ceil(count / limit);
@@ -50,7 +54,7 @@ const customerInfo = async (req, res) => {
         
     } catch (error) {
         console.log('Error loading customers', error);
-        res.status(500).send('Server error');
+        res.redirect('/admin/page-error')
     }
 }
 
@@ -60,11 +64,16 @@ const userBlocked = async (req, res) => {
 
         let id = req.query.id;
         await User.updateOne({_id: id}, {$set:{isBlocked: true}});
+
+        if(req.session.user){
+            delete req.session.user
+        }
+
         res.redirect('/admin/users')
         
     } catch (error) {
         console.log(error);
-        res.status(500).send('Server error');
+        res.redirect('/admin/page-error')
     }
 }
 
@@ -78,7 +87,7 @@ const userUnblocked = async (req, res) => {
         
     } catch (error) {
         console.log(error);
-        res.status(500).send('Server error');
+        res.redirect('/admin/page-error')
     }
 }
 

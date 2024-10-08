@@ -1,0 +1,142 @@
+{{> admin/header}}
+
+
+<div class="content-header"></div>
+    <div>
+        <h2 class="content-title card-title">Orders</h2>
+    </div>
+</div>
+
+<header class="card-header text-center mb-20">
+    <form action="" method="get" class="d-inline">
+        <div class="input-group input-group-sm border border-1 border-grey rounded-pill" style="width: 500px; margin-left: 230px;">
+            <input type="text" class="form-control border-0 rounded-pill" placeholder="Search orders or customers" name="search">
+            <button class="btn border-0" type="submit">Search</button>
+        </div>
+    </form>
+</header>
+
+<div class="right mt-5">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col"><b>Order ID</b></th>
+                <th scope="col"><b>Customer Name</b></th>
+                <th scope="col"><b>Order Date</b></th>
+                <th scope="col"><b>Total Amount</b></th>
+                <th scope="col"><b>Status</b></th>
+                <th scope="col"><b>Action</b></th>
+                <th scope="col"><b>Change Status</b></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each order}}
+            <tr>
+                <td>{{orderId}}</td>
+                <td>{{userId.name}}</td>
+                <td>{{formatDate createdOn}}</td>
+                <td>₹ {{finalAmount}}</td>
+                <td>{{status}}</td>
+                <td>
+                    {{#if (eq status 'Cancelled')}}
+                    {{else}}
+                    <button class="btn btn-danger" style="width: 80px" onclick="cancelOrder('{{orderId}}')">Cancel</button>
+                    {{/if}}
+                </td>
+                <td>{{#if (eq status 'Cancelled')}}
+                    {{else}}
+                    <select name="status" class="form-select" data-order-id="{{orderId}}" style="background-color: white;" onchange="changeOrderStatus(this)">
+                        <option value="Pending" {{#if (eq status 'Pending')}}selected{{/if}}>Pending</option>
+                        <option value="Processing" {{#if (eq status 'Processing')}}selected{{/if}}>Processing</option>
+                        <option value="Shipped" {{#if (eq status 'Shipped')}}selected{{/if}}>Shipped</option>
+                        <option value="Delivered" {{#if (eq status 'Delivered')}}selected{{/if}}>Delivered</option>
+                        <option value="Return Request" {{#if (eq status 'Return Request')}}selected{{/if}}>Return Request</option>
+                        <option value="Returned" {{#if (eq status 'Returned')}}selected{{/if}}>Returned</option>
+                    </select>
+                    {{/if}}
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function changeOrderStatus(selectElement){
+        const status = selectElement.value;
+        const orderId = selectElement.getAttribute('data-order-id');
+
+
+        $.ajax({
+            url: ('/admin/orders/changeStatus'),
+            method: 'POST',
+            data : {
+                status: status,
+                id: orderId
+            },
+            success: function(response){
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Status Updated',
+                    text: 'The Order Status Has Updated Successfully',
+                    showConfirmButton: false,
+                    timer: 1000
+                }).then(() => {
+                    location.reload();
+                })
+            },
+            error: function(err){
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error Updating Status'
+                })
+            }
+        })
+    }
+
+
+    function cancelOrder(orderId){
+        Swal.fire({
+            title: 'Are You Sure?',
+            text: 'You Are About to Cancel This Order',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Cancel it!',
+            cancelButtonText: 'No, Keep it'
+        }).then((result) => {
+            if(result.isConfirmed){
+                $.ajax({
+                    url: '/admin/orders/cancelOrder',
+                    method: 'POST',
+                    data: {id: orderId},
+                    success: function(response){
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Cancelled!',
+                            text: 'The order has been cancelled.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                        .then(() => {
+                            location.reload()
+                        })
+                    },
+                    error: function(error){
+                         Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'There was an issue canceling the order.',
+                        });
+                    }
+                })
+            }
+        })
+    }
+</script>
+
+
+{{> admin/footer}}

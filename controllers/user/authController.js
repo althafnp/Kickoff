@@ -98,14 +98,7 @@ const securePassword = async (password) => {
 }
 
 
-// const loadOtpPage = async (req, res) => {
-//     try {
-//         return res.render('verify-otp');
-//     } catch (error) {
-//         console.log('Otp page not found', error);
-//         res.status(500).send('Server error');
-//     }
-// }
+
 //VERIFYING OTP
 const verifyOtp = async (req, res) => {
     try {
@@ -175,6 +168,7 @@ const loadLoginPage = async (req, res) => {
             return res.render('login');
         }
         else{
+            console.log(req.session.user)
             res.redirect('/')
         }
 

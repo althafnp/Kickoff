@@ -6,19 +6,17 @@ const userAuth = (req, res, next) => {
         User.findById(req.session.user)
         .then((data) => {
             if(data && !data.isBlocked){
-                next();
+                req.user = data;
             }
-            else{
-                res.redirect('/auth/login');
-            }
+            next()
         })
         .catch((error) => {
             console.log('Error in user auth middleware', error);
-            res.status(500).send('Server Error')
+            next()
         })
     }
     else{
-        res.redirect('/auth/login ')
+        next()
     }
 }
 

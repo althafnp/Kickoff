@@ -3849,3 +3849,37 @@ ol {
 		height: 250px;
 	}
 }
+
+/* Success Toastr */
+.toast-success {
+    background-color: #28a745 !important;  /* Green background for success */
+    color: #fff !important;  /* White text for success */
+}
+
+/* Error Toastr */
+.toast-error {
+    background-color: #dc3545 !important;  /* Red background for error */
+    color: #fff !important;  /* White text for error */
+}
+
+/* Info Toastr */
+.toast-info {
+    background-color: #17a2b8 !important;  /* Blue background for info */
+    color: #fff !important;  /* White text for info */
+}
+
+/* Warning Toastr */
+.toast-warning {
+    background-color: #ffc107 !important;  /* Yellow background for warning */
+    color: #fff !important;  /* Black text for warning */
+}
+/* Ensure the toastr has full opacity on load */
+.toast {
+    opacity: 1 !important;  /* Make sure it's fully visible immediately */
+    transition: none !important;  /* Disable any transition or animation effect */
+}
+
+/* Disable the hover opacity change */
+.toast:hover {
+    opacity: 1 !important;  /* Ensure it doesn't change opacity when hovered */
+}

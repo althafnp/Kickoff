@@ -1,0 +1,94 @@
+{{> user/header}}
+
+<style>
+    a{
+        color: black;
+        text-decoration: none;
+    }
+    a:hover{
+        color: black;
+    }
+</style>
+
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Wishlist</h4>
+                    <div class="breadcrumb__links">
+                        <a href="/">Home</a>
+                        <span>Wishlist</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
+
+<!-- Wishlist Section Begin -->
+<section class="shopping-cart spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                {{#if message}}
+                <div style="margin-bottom: 10px"></div>
+                    <h4 style="text-align: center; font-weight: bold; color: rgb(241, 45, 45)">{{message}}</h3>
+                </div>
+                {{else}}
+                <div class="shopping__cart__table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Details</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each products}}
+
+                            <tr>
+                                <td class="product__cart__item" style="width: 60rem">
+                                    <a href="/shop/details/{{productId._id}}">
+                                        <div class="product__cart__item__pic" style="width: 5rem;">
+                                            <img src="/uploads/re-image/{{productId.productImage.[0]}}" alt="">
+                                        </div>
+                                    </a>    
+                                </td>
+                                <td class="cart__price" style="width: 75rem;">
+                                    <a href="/shop/details/{{productId._id}}">
+                                        <div class="product__cart__item__text" style="display: flex; align-items: center; gap: 2rem;">
+                                            <h5 style="font-weight: 600;">{{productId.productName}}</h5><span>-</span>
+                                            <h6>₹ {{productId.salePrice}}</h6>
+                                        </div>
+                                    </a>    
+                                </td>
+                                <td class="cart__close">
+                                    <a href="/wishlist/remove/{{productId._id}}">
+                                        <i class="fa fa-close"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {{/each}}
+                            {{/if}}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="continue__btn">
+                            <a href="/shop">Continue Shopping</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Wishlist Section End -->
+
+
+{{> user/footer}}

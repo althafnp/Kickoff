@@ -1,0 +1,60 @@
+
+{{> user/header}}
+
+
+
+    <style>
+        .success-main-container{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f3f2ee;
+            height: 40rem;
+        }
+        .success-container {
+            text-align: center;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .success-icon {
+            font-size: 80px;
+            color: #28a745;
+        }
+        .success-message {
+            font-size: 24px;
+            margin-top: 10px;
+        }
+        .btn-see-orders {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: black;
+            color: #fff;
+            text-decoration: none;
+            border: 1px solid black;
+            transition: .3s ease-in-out;
+        }
+        .btn-see-orders:hover {
+            background-color: white;
+            color: black;
+        }
+    </style>
+
+
+
+    <div class="success-main-container">
+        <div class="success-container">
+            <div class="success-icon">
+                &#10004; <!-- Checkmark icon -->
+            </div>
+            <div class="success-message">
+                Your order has been placed successfully!
+            </div>
+            <p class="mt-3">Thank you for shopping with us.</p>
+            <a href="/orders" class="btn-see-orders">See My Orders</a>
+        </div>
+    </div>
+
+
+{{> user/footer}}
+

@@ -1,0 +1,182 @@
+{{> user/header}}
+
+<style>
+    .cancel-order-btn{
+        background-color: black;
+        color: white;
+        padding: 5px;
+        font-size: small;
+        border-radius: 2px;
+        border: 1px solid black;
+        transition: .3s ease-in-out;
+        width: 100px;
+    }
+
+    .cancel-order-btn:hover{
+        background-color: white;
+        color: black;
+    }
+
+    .order-details-btn{
+        background-color: black;
+        color: white;
+        padding: 5px 17px;
+        font-size: small;
+        border-radius: 2px;
+        border: 1px solid black;
+        transition: .3s ease-in-out;
+        width: 100px;
+    }
+
+    .order-details-btn:hover{
+        background-color: white;
+        color: black;
+    }
+</style>
+
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Orders</h4>
+                    <div class="breadcrumb__links">
+                        <a href="/">Home</a>
+                        <span>Orders</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="order-history spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                {{#if message}}
+                <div style="text-align: center; margin-bottom: 10px">
+                    <h4 style="font-weight: bold; color: rgb(241, 45, 45)">{{message}}</h4>
+                </div>
+                {{else}}
+                <div class="order__table">
+                    <table style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each order}}
+                            {{#each orderedItems}}
+                            <tr style="height: 8rem;">
+                                <td class="product__cart__item">
+                                    <div style="display: flex; align-items: center;">
+                                        <div class="product__cart__item__pic" style="width: 5rem;">
+                                            <img src="/uploads/re-image/{{this.product.productImage.[0]}}" alt="">
+                                        </div>
+                                        <div class="product__cart__item__text" style="margin-left: 10px;">
+                                            <h6 style="margin: 0;">{{this.product.productName}} ({{size}})</h6>
+                                            <h6 style="margin: 0;">₹ {{this.product.salePrice}}</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="custom-quantity__item">
+                                    <span>{{this.quantity}}</span>
+                                </td>
+                                <td>₹ {{price}}</td>
+                                <td class="cart__price">₹ {{../totalPrice}}</td>
+                                <td class="order__status">
+                                    <span class="order-status">{{../status}}</span>
+                                </td>
+
+                                <td>
+                                {{#if (eq ../status 'Pending')}}
+                                    <button class="cancel-order-btn" data-order-id="{{../_id}}">Cancel Order</button>
+                                {{/if}}
+                                </td>
+
+
+                                <td>
+                                    <a href="/orders/details/{{../id}}" class="order-details-btn">View</a>
+                                </td>
+                            </tr>
+                            {{/each}}
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+                {{/if}}
+                <div class="row" style="display: flex; justify-content: flex-end;">
+                    <div class="col-lg-4">
+                        <div class="order__summary">
+                            <h6>Your Orders</h6>
+                            <p>Total Orders: {{order.length}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6">
+                    <div class="continue__btn">
+                        <a href="/shop">Continue Shopping</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    $(document).on('click', '.cancel-order-btn', function () {
+        const orderId = $(this).data('order-id');
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you really want to cancel this order?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+               
+                $.ajax({
+                    url: `/orders/cancel/${orderId}`,
+                    method: 'POST',
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Order Cancelled',
+                            text: response.message
+                        }).then(() => {
+                            location.reload(); 
+                        });
+                    },
+                    error: function (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: error.responseJSON.message
+                        });
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+
+{{> user/footer}}

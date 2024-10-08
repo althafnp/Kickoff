@@ -1,0 +1,85 @@
+{{> user/header}}
+
+
+
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header text-center">
+            <h2>Order Summary</h2>
+        </div>
+        <div class="card-body">
+            <h3>Order Details</h3>
+            <br>
+            <h5 style="margin-bottom: 10px;">Order Id: {{order.orderId}}</h5>
+            <div class="row mb-4">
+                {{#each order.orderedItems}}
+                <div class="col-md-3" style="margin: 10px 0px;">
+                    <img src="/uploads/re-image/{{product.productImage.[0]}}" alt="Item Name" class="img-fluid rounded" style="width: 10rem;">
+                </div>
+                <div class="col-md-9">
+                    <h4 class="item-name">{{product.productName}}</h4>
+                    <p><strong>Quantity:</strong> <span class="item-quantity">{{quantity}}</span></p>
+                    <p><strong>Price:</strong> <span class="item-price">₹ {{price}}</span></p>
+                    <p><strong>Size:</strong> <span class="item-size">{{size}}</span></p>
+                </div>
+                {{/each}}
+            </div>
+
+            <h4>Final Amount: <span class="final-amount">₹ {{order.finalAmount}}</span></h4>
+
+            <h3 class="mt-4">Shipping Address</h3>
+            <p><strong>Name:{{usedAddress.name}}</strong></p>
+            <p>Phone: {{usedAddress.phone}}</p>
+            <p>House NO: {{usedAddress.houseNo}}</p>
+            <p>Landmark: {{usedAddress.landmark}}</p>
+            <p>City: {{usedAddress.city}}</p>
+            <p>State: {{usedAddress.state}}</p>
+            <p>Pincode: {{usedAddress.pinCode}}</p>
+
+            <h3 class="mt-4">Payment Method</h3>
+            <p><strong>{{order.paymentMethod}}</strong></p>
+
+            <h3 class="mt-4">Status</h3>
+            <p><strong>{{order.status}}</strong></p>
+            
+            {{#if (eq order.status 'Delivered')}}
+            <button id="requestReturnBtn" class="btn btn-danger btn-block mt-4">Request Return</button>
+            {{else}}
+            <button class="btn btn-danger btn-block mt-4" disabled>Request Return</button>
+            {{/if}}
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script>
+    document.getElementById('requestReturnBtn').addEventListener('click', async() => {
+        const orderId = '{{order.orderId}}'
+
+        try{
+            const response = await fetch('/orders/return-request', {
+                method: 'POST',
+                headers:{'Content-Type': 'application/json'},
+                body: JSON.stringify({orderId})
+            })
+
+            const data = await response.json()
+
+            if(data.success){
+                toastr.success('Return request Sent')
+            }
+            else{
+                toastr.error('Failed to request return')
+            }
+        }
+        catch (error) {
+            console.error('Error requesting return:', error);
+        }
+    })
+</script>
+
+{{> user/footer}}

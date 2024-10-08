@@ -1,12 +1,189 @@
 {{> admin/header}}
 
-<section class="content-main">
-    <div class="content-header">
-        <div>
-            <h2 class="content-title card-title">Dashboard </h2>
+    <style>
+        .custom-date {
+            display: none;
+        }
+
+        .custom-date.show {
+            display: block;
+        }
+
+        #salesTable {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .col-md-3 {
+                margin-bottom: 10px;
+            }
+        }
+
+        .modal-xl {
+            max-width: 90%;
+        }
+
+        .top-selling-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .list-group-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .item-count {
+            margin-left: 10px;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .btn-lg {
+            margin-top: -10px;
+            margin-bottom: 10px;
+            margin-right: 20px;
+        }
+
+        #barChart {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+
+
+
+    <div class="container mt-4">
+        <h1 class="mb-4">Sales Report</h1>
+        <div class="d-flex justify-content-end mt-3" style="margin-top: -10px; margin-right: 20px;">
+            <button id="showTopSelling" class="btn btn-info btn-lg" data-bs-toggle="modal"
+                data-bs-target="#topSellingModal">
+                Show Top 10 Selling
+            </button>
         </div>
-       
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Orders</h5>
+                        <p id="totalOrders" class="card-text" style="font-weight: 500; font-size: 20px;">{{totalOrders}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Revenue</h5>
+                        <p id="totalRevenue" class="card-text" style="font-weight: 500; font-size: 20px;">₹{{toFixed totalRevenue 1}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Discount</h5>
+                        <p id="totalDiscount" class="card-text" style="font-weight: 500; font-size: 20px;">₹{{toFixed totalDiscount 1}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <select id="filterType" class="form-select">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+            <div class="col-md-3 custom-date">
+                <input type="date" id="startDate" class="form-control" placeholder="Start Date">
+            </div>
+            <div class="col-md-3 custom-date">
+                <input type="date" id="endDate" class="form-control" placeholder="End Date">
+            </div>
+            <div class="col-md-3">
+                <button id="applyFilter" class="btn btn-primary">Apply Filter</button>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end mt-3">
+            <button id="downloadPdf" class="btn btn-danger me-2">Download PDF</button>
+            <button id="downloadExcel" class="btn btn-success">Download Excel</button>
+        </div>
+
+        <canvas id="barChart" width="100" height="50"></canvas>
+
+        <table id="salesTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Order Id</th>
+                    <th>Username</th>
+                    <th>Total Amount</th>
+                    <th>Final Amount</th>
+                    <th>Status</th>
+                    <th>Payment Method</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody id="salesTableBody">
+                {{#each orders}}
+                <tr>
+                    <td>{{increment @index}}</td>
+                    <td>{{userId.name}}</td>
+                    <td>₹{{totalPrice}}</td>
+                    <td>₹{{finalPrice}}</td>
+                    <td>{{status}}</td>
+                    <td>{{paymentMethod}}</td>
+                    <td>{{formatDate createdOn}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
     </div>
-</section>
+
+    <!-- Modal for Top 10 Selling Products, Brands, and Types -->
+    <div class="modal fade" id="topSellingModal" tabindex="-1" aria-labelledby="topSellingModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold" id="topSellingModalLabel">Top 10 Selling Products, Brands, and Types
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <h5 class="text-center mb-3">Top 10 Products</h5>
+                            <ul id="topProducts" class="list-group list-group-flush top-selling-list"></ul>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <h5 class="text-center mb-3">Top 10 Brands</h5>
+                            <ul id="topBrands" class="list-group list-group-flush top-selling-list"></ul>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <h5 class="text-center mb-3">Top 10 Types</h5>
+                            <ul id="topTypes" class="list-group list-group-flush top-selling-list"></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 {{> admin/footer}}

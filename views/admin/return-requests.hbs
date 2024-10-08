@@ -1,0 +1,52 @@
+{{> admin/header}}
+
+
+
+<div class="container">
+    <h1>Return Requests</h1>
+
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Order Id</th>
+                <th>User</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each returnRequests}}            
+            <tr>
+                <td>{{this.orderId}}</td>
+                <td>{{this.userId.name}}</td>
+                <td>
+                    <button class="btn btn-success" onclick="processReturn('{{this.orderId}}', 'approve')">Approve</button>
+                    <button class="btn btn-danger" onclick="processReturn('{{this.orderId}}', 'deny')">Deny</button>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function processReturn(orderId, action) {
+        fetch('/admin/process-return', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId, action })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+            } else {
+                alert('Failed to process return request.');
+            }
+        })
+        .catch(error => console.error('Error processing return:', error));
+    }
+
+</script>
+
+{{> admin/footer}}

@@ -1,0 +1,266 @@
+{{> user/header}}
+ 
+<style>
+.col-lg-4,
+.col-md-6,
+.col-sm-6{
+    margin-bottom: 20px;
+}
+
+.product-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  border-radius: 5px;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+
+.product-link-wrapper {
+  display: block;
+  text-decoration: none;
+}
+
+.product-image {
+  width: 100%;
+  padding-top: 75%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  height: 250px;
+  transition: .2s ease-in-out;
+}
+
+.product-image:hover{
+    transform: scale(1.05);
+}
+
+.product-label {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgb(217, 27, 27);
+  color: white;
+  border-radius: 2px;
+  padding: 5px 5px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.product-info {
+  padding: 15px;
+  text-align: center;
+}
+
+.product-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.add-to-cart {
+  background-color: black;
+  color: white;
+  padding: 8px 15px;
+  font-size: 14px;
+  margin-bottom: 10px;
+  display: inline-block;
+  border: 1px solid black;
+  border-radius: 3px;
+  text-decoration: none;
+  transition: .3s ease-in-out;
+}
+
+.add-to-cart:hover {
+  background-color: white;
+  color: black;
+  border: 1px solid black;
+}
+
+.product-rating i {
+  color: #ffd700;
+}
+
+.product-price {
+  font-size: 16px;
+  font-weight: bold;
+}
+</style>
+
+
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Shop</h4>
+                    <div class="breadcrumb__links">
+                        <a href="/">Home</a>
+                        <span>Shop</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
+
+<!-- Shop Section Begin -->
+<section class="shop spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="shop__sidebar">
+                    <div class="shop__sidebar__search">
+                        <form action="">
+                            <input type="text" placeholder="Search..." name="search"/>
+                            <button type="submit"><span class="icon_search"></span></button>
+                        </form>
+                    </div>
+                    <div class="shop__sidebar__accordion">
+                        <div class="accordion" id="accordionExample">
+                            <div class="card">
+                                <div class="card-heading">
+                                    <a data-toggle="collapse" data-target="#collapseOne">Clubs</a>
+                                </div>
+                                <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
+                                    <div class="card-body">
+                                        <div class="shop__sidebar__categories">
+                                            <ul class="nice-scroll">
+                                                {{#each clubs}}
+                                                <li><a href="/shop?category={{name}}">{{name}}</a></li>
+                                                {{/each}}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-heading">
+                                    <a data-toggle="collapse" data-target="#collapseTwo">Nationalities</a>
+                                </div>
+                                <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
+                                    <div class="card-body">
+                                        <div class="shop__sidebar__brand">
+                                            <ul>
+                                                {{#each nationality}}
+                                                <li><a href="/shop?category={{name}}">{{name}}</a></li>
+                                                {{/each}}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="shop__product__option">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="shop__product__option__left">
+                                <p>Showing {{currentPage}}–{{totalPages}} of {{totalProducts}} results</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="shop__product__option__right">
+                                <p>Sort:</p>
+                                <form action="/shop" method="get">
+                                    <select name="sort" onchange="this.form.submit()">
+                                        <option value="" {{#if (eq sort '')}} selected {{/if}}>None</option>
+                                        <option value="priceAsc" {{#if (eq sort 'priceAsc')}} selected {{/if}}>Price Low To High</option>
+                                        <option value="priceDesc" {{#if (eq sort 'priceDesc')}} selected {{/if}}>Price High To Low</option>
+                                        <option value="nameAsc" {{#if (eq sort 'nameAsc')}} selected {{/if}}>A-Z</option>
+                                        <option value="nameDesc" {{#if (eq sort 'nameDesc')}} selected {{/if}}>Z-A</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    {{#each products}}
+                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <div class="product-card">
+                            <a href="/shop/details/{{_id}}" class="product-link-wrapper">
+                                <div class="product-image" style="background-image: url('/uploads/re-image/{{productImage.[0]}}');">
+                                {{#if (eq productOffer 0)}}
+                                {{else}}
+                                <span class="product-label">{{productOffer}}% off</span>
+                                {{/if}}
+                                </div>
+                            </a>
+                            <div class="product-info">
+                                <h6 class="product-title">{{productName}}</h6>
+                                <a href="#" class="add-to-cart" id="add-to-wishlist" data-id="{{_id}}"=>+ Add To Wishlist</a>
+                                <div class="product-rating">
+                                    <i class="fa fa-star-o"></i>
+                                    <i class="fa fa-star-o"></i>
+                                    <i class="fa fa-star-o"></i>
+                                    <i class="fa fa-star-o"></i>
+                                    <i class="fa fa-star-o"></i>
+                                </div>
+                              <h5 class="product-price">₹ {{salePrice}}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="product__pagination">
+                            {{#if (gt currentPage 1)}}
+                            <a href="/shop?page={{subtract currentPage 1}}"><i class="fa fa-angle-left"></i></a>
+                            {{/if}}
+
+                            {{#each (range 1 totalPages)}}
+                            <a href="/shop?page={{this}}" class="{{#ifEquals this ../currentPage}}active{{/ifEquals}}">
+                                {{this}}
+                            </a>
+                            {{/each}}
+
+                            {{#if (lt currentPage totalPages)}}
+                            <a href="/shop?page={{add currentPage 1}}"><i class="fa fa-angle-right"></i></a>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Shop Section End -->
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script>
+    $(document).on('click', '#add-to-wishlist', function(e) {
+        e.preventDefault()
+
+        const productId = $(this).data('id')
+
+        $.ajax({
+            url: '/wishlist/add',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                productId: productId
+            }),
+            success: function(response){
+                window.location.href = '/wishlist';
+            },
+            error: function(error){
+                console.log('Error adding to wishlist')
+                toastr.error(error.responseJSON.error)
+            }
+        })
+    })
+</script>
+
+{{> user/footer}}

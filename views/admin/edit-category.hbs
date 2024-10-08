@@ -1,0 +1,78 @@
+{{> admin/header}}
+
+
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 mt-60">
+            <form id="editCategoryForm">
+                <div class="d-grid text-end mt-30 col-md-5">
+                    <button class="btn btn-primary" type="submit">Update category</button>
+                </div>
+                <div class="mb-4 mt-30">
+                    <label for="product_name" class="form-label">Category Type</label>
+                    <input type="text" id="categoryType" name="categoryType" value="{{category.categoryType}}" class="form-control border" required/>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label">Name</label>
+                    <input name="name" id="name" class="form-control border" value="{{category.name}}" required>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+    $('#editCategoryForm').submit(function(e) {
+      e.preventDefault();
+
+      const categoryType = $('#categoryType').val().trim();
+      const name = $('#name').val().trim();
+      const categoryId = '{{category._id}}'; // Capture the category ID for the update request
+
+      // Client-side validation
+      if (!categoryType || !name) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Both fields are required!',
+        });
+        return;
+      }
+
+      // AJAX request to update category
+      $.ajax({
+        url: `/admin/category/editCategory/${categoryId}`,
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ categoryType, name }),
+        success: function(response) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Category Updated',
+            text: 'The category has been successfully updated!',
+          }).then(() => {
+            // Redirect or reload the page
+            window.location.href = '/admin/category';
+          });
+        },
+        error: function(xhr) {
+          const errorResponse = JSON.parse(xhr.responseText);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: errorResponse.error,
+          });
+        }
+      });
+    });
+  });
+</script>
+
+
+{{> admin/footer}}

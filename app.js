@@ -9,8 +9,12 @@ const nocache  = require('nocache')
 
 
 const passport = require('./config/passport')
-const db = require('./config/db');
-db()
+const db = require('./config/db')
+db();
+
+const registerHelper = require('./helpers/hbsHelpers')
+registerHelper();
+
 const userRouter = require('./routes/userRouter')
 const authRouter = require('./routes/authRouter')
 const adminRouter = require('./routes/adminRouter')
@@ -21,9 +25,7 @@ app.set('view engine', 'hbs');
 app.set('views', [path.join(__dirname, 'views/user'), path.join(__dirname, 'views/admin')]);
 
 
-hbs.registerHelper('eq', function(a, b) {
-    return a == b;
-});
+
 hbs.registerPartials(path.join(__dirname, 'views/partials'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
