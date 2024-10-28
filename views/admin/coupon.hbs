@@ -2,45 +2,74 @@
 
 
 <div class="container">
-    <h1>Coupon List</h1>
+    <h2>Coupon List</h2>
 
     <!-- Button to open Add Coupon modal -->
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCouponModal">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCouponModal" style="margin-bottom: 1rem;">
         Add Coupon
     </button>
 
     <!-- Coupon Table -->
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Coupon Code</th>
-                <th>Offer (%)</th>
-                <th>Min Amount</th>
-                <th>Max Amount</th>
-                <th>Expiry Date</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each coupons}}
-            <tr>
-                <td>{{code}}</td>
-                <td>{{couponOffer}}</td>
-                <td>{{minAmount}}</td>
-                <td>{{maxAmount}}</td>
-                <td>{{formatDate expireOn}}</td>
-                <td>{{status}}</td>
-                <td>
-                    <!-- You can add Edit/Delete buttons here -->
-                    <form action="/admin/delete-coupon/{{this._id}}" method="POST">
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {{/each}}
-        </tbody>
-    </table>
+    <div class="coupon-container">
+        <!-- Card layout for mobile -->
+        <div class="d-block d-md-none">
+            <div class="row">
+                {{#each coupons}}
+                <div class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Coupon Code: {{code}}</h5>
+                            <p class="card-text"><strong>Offer:</strong> {{couponOffer}}%</p>
+                            <p class="card-text"><strong>Min Amount:</strong> {{minAmount}}</p>
+                            <p class="card-text"><strong>Max Amount:</strong> {{maxAmount}}</p>
+                            <p class="card-text"><strong>Expiry Date:</strong> {{formatDate expireOn}}</p>
+                            <p class="card-text"><strong>Status:</strong> {{status}}</p>
+                            <div class="d-flex justify-content-between">
+                                <form action="/admin/delete-coupon/{{this._id}}" method="POST">
+                                    <button type="submit" class="btn btn-danger" style="width: 100%;">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+
+        <!-- Table layout for larger screens -->
+        <div class="d-none d-md-block">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Coupon Code</th>
+                        <th>Offer (%)</th>
+                        <th>Min Amount</th>
+                        <th>Max Amount</th>
+                        <th>Expiry Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each coupons}}
+                    <tr>
+                        <td>{{code}}</td>
+                        <td>{{couponOffer}}</td>
+                        <td>{{minAmount}}</td>
+                        <td>{{maxAmount}}</td>
+                        <td>{{formatDate expireOn}}</td>
+                        <td>{{status}}</td>
+                        <td>
+                            <form action="/admin/delete-coupon/{{this._id}}" method="POST">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <!-- Add Coupon Modal -->
@@ -115,6 +144,8 @@
             const maxAmount = $('input[name="maxAmount"]').val();
             const expireOn = $('input[name="expireOn"]').val();
 
+            const expireOnDate = new Date(expireOn).getTime();
+
             let valid = true;
 
             // Validation for coupon offer percentage (0-100)
@@ -138,6 +169,11 @@
             // Ensure minimum amount is less than or equal to maximum amount
             if (minAmount > maxAmount) {
                 $('#maxAmountError').text('Maximum amount should be greater than or equal to the minimum amount.');
+                valid = false;
+            }
+
+            if (expireOnDate < Date.now()) {
+                $('#expireOnError').text('Expire date must be a future date.')
                 valid = false;
             }
 

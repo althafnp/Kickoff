@@ -24,17 +24,17 @@ const getProductPage = async (req, res) => {
 
 
 
-        const totalProducts = await Product.countDocuments();
-        const totalPages = Math.ceil(totalProducts / limit);
+        const count = await Product.countDocuments();
+        const totalPages = Math.ceil(count / limit);
 
-
+        const pages = Array.from({length: totalPages}, (_, i) => i + 1)
 
 
         res.render('products', {
             product,
-            currentPage: page,
-            totalPages: totalPages,
-            totalProducts: totalProducts
+            pages,
+            totalPages,
+            currentPage: page
         })
 
     } catch (error) {
@@ -112,9 +112,7 @@ const addProducts = async (req, res) => {
     try {
 
         const {productName, description, regularPrice, offer, size, stock, type, category, name, images} = req.body;
-        const productExists = await Product.findOne({
-            productName: productName,
-        })
+        const productExists = await Product.findOne({productName: {$regex: new RegExp(`^${productName}$`, 'i')}})
 
         const variants = size.map((s, index) => ({
             size: s,

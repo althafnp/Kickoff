@@ -1,4 +1,5 @@
-{{> user/header}}
+{{> admin/header}}
+
 
 
 <style>
@@ -176,9 +177,6 @@
         <span>
             Ordered On : {{formatDate order.createdOn}} | Order Id : {{order.orderId}}
         </span>
-        {{#if (eq order.status "Delivered")}}
-            <button id="downloadInvoice" class="btn btn-success me-2">Download Invoice</button>
-        {{/if}}
     </div>
 
 
@@ -220,7 +218,7 @@
                 <span>{{order.coupon.offer}}%</span>
             </div>
             <div>
-                <span style="color: green; font-weight: bold">You Have Saved ₹{{order.discount}}</span>
+                <span style="color: green; font-weight: bold">User Saved ₹{{order.discount}}</span>
             </div>
             {{/if}}
             <hr>
@@ -230,11 +228,7 @@
             </div>
         </div>
     </div>
-    {{#if (eq order.paymentStatus "Failed")}}
-    <div class="d-flex justify-content-end ">
-        <button id="continue-payment-btn" style="color: white;" class="btn btn-success">Continue Payment</button>
-    </div>
-    {{/if}}
+
 
 
     <h4>Items Ordered</h4>
@@ -267,143 +261,13 @@
 </div>
 
     <div class="d-flex justify-content-between" style="margin-bottom: 4rem;">
-        <a href="/orders" class="btn btn-secondary">Back to Orders</a>
-        {{#if (eq order.status "Delivered")}}
-            <button id="requestReturnBtn" class="btn btn-danger return-btn btn-sm">Request Return</button>
-        {{/if}}
+        <a href="/admin/orders" class="btn btn-secondary">Back to Orders</a>
     </div>
 </div>
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-<script>
 
 
-    document.addEventListener("DOMContentLoaded", () => {
-        const requestReturnBtn = document.getElementById('requestReturnBtn');
-        const continuePaymentBtn = document.getElementById('continue-payment-btn');
-        const downloadInvc = document.getElementById('downloadInvoice');
-
-        if(downloadInvc){
-            downloadInvc.addEventListener('click', () => {
-                const orderId = '{{order.orderId}}';
-                window.location.href = `/download-invoice/${orderId}`
-            })
-        }
-
-        if(requestReturnBtn){
-            requestReturnBtn.addEventListener('click', async() => {
-                const orderId = '{{order.orderId}}'
-                try{
-                    const response = await fetch('/orders/return-request', {
-                        method: 'POST',
-                        headers:{'Content-Type': 'application/json'},
-                        body: JSON.stringify({orderId})
-                    })
-                    const data = await response.json()
-                    if(data.success){
-                        toastr.success('Return request Sent')
-                    }
-                    else{
-                        toastr.error('Failed to request return')
-                    }
-                }
-                catch (error) {
-                    console.error('Error requesting return:', error);
-                }
-            })
-        }
-
-
-        if(continuePaymentBtn){
-            continuePaymentBtn.addEventListener('click', async() => {
-                const orderId = '{{order._id}}';
-                try{            
-                    fetch(`/orders/continue-payment/${orderId}`, {
-                        method: 'POST'
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            var options = {
-                                "key": data.key,
-                                "amount": data.amount,
-                                "currency": data.currency,
-                                "name": "KICKOFF",
-                                "description": "Continue Payment for Order #" + orderId,
-                                "order_id": data.razorpayOrderId,
-                                "handler": async function (response) {
-                                    const captureResponse = await fetch('/checkout/capture-payment', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body: JSON.stringify({
-                                            razorpay_payment_id: response.razorpay_payment_id,
-                                            razorpay_order_id: response.razorpay_order_id,
-                                            razorpay_signature: response.razorpay_signature
-                                        })
-                                    })
-
-                                    const captureResult = await captureResponse.json();
-
-                                    if (captureResult.success) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'Payment Successful!',
-                                            text: 'Your order has been placed successfully.',
-                                            confirmButtonText: 'Okay'
-                                        }).then(() => {
-                                            window.location.href = captureResult.redirectUrl;
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Payment failed!',
-                                            text: captureResult.message || 'Something went wrong, please try again.',
-                                            confirmButtonText: 'Okay'
-                                        }).then(() => {
-                                            window.location.href = '/payment-failed'
-                                        })
-                                    }
-                                },
-                                "prefill": {
-                                    "name": "{{user.name}}",
-                                    "email": "{{user.email}}"
-                                },
-                                "theme": {
-                                    "color": "#528FF0"
-                                }
-                            };
-                            var rzp = new Razorpay(options);
-                            rzp.open();
-                        } else {
-                             Swal.fire({
-                                icon: 'error',
-                                title: 'Failed to initiate Razorpay payment!',
-                                text: result.message || 'Something went wrong, please try again.',
-                                confirmButtonText: 'Okay'
-                            })
-                        }
-                    });
-                }
-                catch(error) {
-                     Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: 'Could not connect to the server, please try again later.',
-                        confirmButtonText: 'Okay'
-                    });
-                }
-            });
-        }
-    })
-
-</script>
-
-
-{{> user/footer}}
+{{> admin/footer}}

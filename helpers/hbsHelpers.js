@@ -31,6 +31,23 @@ const registerHelpers = () => {
     );
 
     hbs.registerHelper('toFixed', (number, decimals) => number.toFixed(decimals));
+
+    hbs.registerHelper('isActive', (index) => {
+      return index === 0 ? 'active' : '';
+    });
+  
+    // Helper to construct the tab ID
+    hbs.registerHelper('tabId', (index) => {
+      return `tabs-${index}`;
+    });
+
+    hbs.registerHelper('imagePath', (image) => {
+      return `/uploads/re-image/${image}`;
+    })
+
+    hbs.registerHelper('or', (arg1, arg2) => {
+      return arg1 || arg2;
+    });
 }
 
 

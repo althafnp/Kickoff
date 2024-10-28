@@ -23,8 +23,11 @@
         <div class="row">
             <div class="col-lg-12">
                 <h4 style="margin-bottom: 2rem;">Available Coupons</h4>
+                {{#if (eq coupon.length 0)}}
+                <h4 style="color: red; text-align: center">No Coupons Available</h4>
+                {{else}}
                 <div class="order__table">
-                    <table style="width: 100%">
+                    <table class="d-none d-lg-table" style="width: 100%">
                         <thead>
                             <tr>
                                 <th>Coupon Code</th>
@@ -38,7 +41,7 @@
                             {{#each coupon}}
                             <tr style="height: 3rem;">
                                 <td style="font-weight: bold;">{{code}}</td>
-                                <td style="color: green; font-weight: bold">{{couponOffer}}%</td>
+                                <td style="color: green; font-weight: bold;">{{couponOffer}}%</td>
                                 <td>{{minAmount}}</td>
                                 <td>{{maxAmount}}</td>
                                 <td>{{formatDate expireOn}}</td>
@@ -46,6 +49,42 @@
                             {{/each}}
                         </tbody>
                     </table>
+
+                    <div class="d-lg-none">
+                        {{#each coupon}}
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <h5 class="card-title" style="font-weight: bold;">Coupon Code: {{code}}</h5>
+                                <p class="card-text" style="color: green; font-weight: bold;">Offer: {{couponOffer}}%
+                                </p>
+                                <p class="card-text">Minimum Price: {{minAmount}}</p>
+                                <p class="card-text">Maximum Price: {{maxAmount}}</p>
+                                <p class="card-text"><strong>Valid Till:</strong> {{formatDate expireOn}}</p>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="product__pagination">
+                    {{#if (gt currentPage 1)}}
+                    <a href="/coupons?page={{subtract currentPage 1}}"><i class="fa fa-angle-left"></i></a>
+                    {{/if}}
+
+                    {{#each (range 1 totalPages)}}
+                    <a href="/coupons?page={{this}}" class="{{#ifEquals this ../currentPage}}active{{/ifEquals}}">
+                        {{this}}
+                    </a>
+                    {{/each}}
+
+                    {{#if (lt currentPage totalPages)}}
+                    <a href="/coupons?page={{add currentPage 1}}"><i class="fa fa-angle-right"></i></a>
+                    {{/if}}
                 </div>
             </div>
         </div>

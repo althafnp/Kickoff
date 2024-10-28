@@ -26,87 +26,81 @@ const loadHomePage = async (req, res) => {
 
 const loadShopPage = async (req, res) => {
     try {
+        // Get search, category, and sort from query
+        const search = req.query.search || '';
+        const categoryName = req.query.category || '';
+        const sortOption = req.query.sort || '';
 
-        //SEARCH
-        let search = '';
-        if(req.query.search){
-            search = req.query.search;
-        }
-
-        //FILTERING USING CATEGORY
+        // Filter by category
         let categoryFilter = {};
-        if(req.query.category){
-            const category = await Category.findOne({name: req.query.category})
-
-            if(category){
-                categoryFilter = {category: category._id}
+        if (categoryName) {
+            const category = await Category.findOne({ name: categoryName });
+            if (category) {
+                categoryFilter = { category: category._id };
             }
-            console.log('dfgd', categoryFilter)
         }
 
-        //PAGINATION
+        // Pagination
         const page = parseInt(req.query.page) || 1;
-        const limit = 9;
+        const limit = 6;
         const skip = (page - 1) * limit;
 
-        //SORTING
-        const sortOption = req.query.sort || '';
+        // Sorting
         let sort = {};
-
-        switch(sortOption){
+        switch (sortOption) {
             case 'priceAsc':
-                sort = {salePrice: 1};
+                sort = { salePrice: 1 };
                 break;
             case 'priceDesc':
-                sort = {salePrice: -1};
+                sort = { salePrice: -1 };
                 break;
             case 'nameAsc':
-                sort = {productName: 1};
+                sort = { productName: 1 };
                 break;
             case 'nameDesc':
-                sort = {productName: -1};
+                sort = { productName: -1 };
                 break;
             default:
                 sort = {};
                 break;              
         }
 
+        // Product Query
         const totalProducts = await Product.countDocuments({
             isBlocked: false,
-            productName: {$regex: '.*' + search + '.*', $options: 'i'},
+            productName: { $regex: '.*' + search + '.*', $options: 'i' },
             ...categoryFilter
         });
 
         const products = await Product.find({
             isBlocked: false,
-            productName: {$regex: '.*' + search + '.*', $options: 'i'},
+            productName: { $regex: '.*' + search + '.*', $options: 'i' },
             ...categoryFilter
         })
         .sort(sort)
         .skip(skip)
-        .limit(limit)
+        .limit(limit);
 
-        const totalPages = Math.ceil(totalProducts / limit)
+        const totalPages = Math.ceil(totalProducts / limit);
 
+        // Fetch categories for sidebar
+        const clubs = await Category.find({ categoryType: 'Club', isListed: true });
+        const nationality = await Category.find({ categoryType: 'Nationality', isListed: true });
 
-        const clubs = await Category.find({categoryType: 'Club', isListed: true})
-        const nationality = await Category.find({categoryType: 'Nationality', isListed: true})
-
-        
-
-
-
+        // Render the response
         if(req.user){
             return res.render('shop', {
                 user: req.user,
                 products,
                 clubs,
                 nationality,
-                currentPage : page,
+                currentPage: page,
                 totalPages,
                 totalProducts,
-                sort: sortOption
-            })
+                sort: sortOption,
+                search: search,
+                category: categoryName
+            });
         }
         else{
             return res.render('shop', {
@@ -116,15 +110,17 @@ const loadShopPage = async (req, res) => {
                 currentPage : page,
                 totalPages,
                 totalProducts,
-                sort: sortOption
+                sort: sortOption,
+                search: search,
+                category: categoryName
             })
         }
-        
+
     } catch (error) {
-        console.log('Shoppage not found', error);
+        console.log('Shop page not found', error);
         res.status(500).send('Server error');
     }
-}
+};
 
 
     
@@ -137,3 +133,5 @@ module.exports = {
     loadShopPage,
 
 }
+
+

@@ -11,7 +11,11 @@
                 </div>
                 <div class="mb-4 mt-30">
                     <label for="product_name" class="form-label">Category Type</label>
-                    <input type="text" id="categoryType" name="categoryType" value="{{category.categoryType}}" class="form-control border" required/>
+                    <select name="categoryType" id="categoryId" class="form-control">
+                      <option selected disabled>{{category.categoryType}}</option>
+                      <option value="Club">Club</option>
+                      <option value="Nationality">Nationality</option>
+                    </select>
                 </div>
                 
                 <div class="mb-4">
@@ -31,9 +35,10 @@
     $('#editCategoryForm').submit(function(e) {
       e.preventDefault();
 
-      const categoryType = $('#categoryType').val().trim();
+      const categoryType = $('#categoryId').val();
       const name = $('#name').val().trim();
       const categoryId = '{{category._id}}'; // Capture the category ID for the update request
+
 
       // Client-side validation
       if (!categoryType || !name) {

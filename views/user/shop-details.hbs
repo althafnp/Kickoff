@@ -1,6 +1,20 @@
 {{> user/header}}
 
+<style>
+    .zoom-container {
+        position: relative;
+        overflow: hidden;
+    }
 
+    .zoom-image {
+        width: 100%;
+        transition: transform 0.2s;
+    }
+
+    .zoom-container:hover .zoom-image {
+        transform: scale(2.5); /* Adjust scale factor as needed */
+    }
+</style>
 
 
 <!-- Shop Details Section Begin -->
@@ -17,65 +31,35 @@
                 </div>
             </div>
             <div class="row">
+                {{!-- small image --}}
                 <div class="col-lg-3 col-md-3">
-                    <ul class="nav nav-tabs" role="tablist">
+                    <ul class="nav nav-tabs">
+                        {{#each product.productImage}}
                         <li class="nav-item">
-                            <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab">
-                                <div class="product__thumb__pic set-bg"
-                                    data-setbg="/uploads/re-image/{{product.productImage.[0]}}">
-                                </div>
+                            <a class="nav-link {{isActive @index}}" onclick="changeImage('{{imagePath this}}')">
+                                <div class="product__thumb__pic set-bg" data-setbg="{{imagePath this}}"></div>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#tabs-2" role="tab">
-                                <div class="product__thumb__pic set-bg"
-                                    data-setbg="/uploads/re-image/{{product.productImage.[1]}}">
-                                </div>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab">
-                                <div class="product__thumb__pic set-bg"
-                                    data-setbg="/uploads/re-image/{{product.productImage.[2]}}">
-                                </div>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#tabs-4" role="tab">
-                                <div class="product__thumb__pic set-bg"
-                                    data-setbg="/uploads/re-image/{{product.productImage.[3]}}">
-                                </div>
-                            </a>
-                        </li>
+                        {{/each}}
                     </ul>
                 </div>
+                {{!-- Large image --}}
                 <div class="col-lg-6 col-md-9">
                     <div class="tab-content">
-                        <div class="tab-pane active" id="tabs-1" role="tabpanel">
-                            <div class="product__details__pic__item hero-image-container" id="magnifier-container">
-                                <img src="/uploads/re-image/{{product.productImage.[0]}}" alt="" class="hero-image"
-                                    id="main-image" data-large-src="/uploads/re-image/{{product.productImage.[0]}}">
-                                <div id="magnifier-lens"></div>
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="tabs-2" role="tabpanel">
+                        {{#each product.productImage}}
+                        <div class="tab-pane {{isActive @index}}">
                             <div class="product__details__pic__item">
-                                <img src="/uploads/re-image/{{product.productImage.[1]}}" alt="">
+                                <div class="zoom-container">
+                                    <img src="{{imagePath this}}" alt="" id="main-image"
+                                        data-large-src="{{imagePath this}}" class="zoom-image">
+                                </div>
                             </div>
                         </div>
-                        <div class="tab-pane" id="tabs-3" role="tabpanel">
-                            <div class="product__details__pic__item">
-                                <img src="/uploads/re-image/{{product.productImage.[2]}}" alt="">
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="tabs-4" role="tabpanel">
-                            <div class="product__details__pic__item">
-                                <img src="/uploads/re-image/{{product.productImage.[3]}}" alt="">
-                            </div>
-                        </div>
+                        {{/each}}
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
     <div class="product__details__content">
@@ -157,7 +141,7 @@
     $(document).on('click', '#add-to-cart', function (e) {
         e.preventDefault();
 
-        // Get the selected size and product ID
+       
         const selectedSize = $('input[name="size"]:checked').val();
         const productId = $(this).data('id');
 
@@ -171,9 +155,9 @@
             return;
         }
 
-        // Make the AJAX request to add the product to the cart
+        
         $.ajax({
-            url: '/cart/add',  // Backend endpoint to handle adding to cart
+            url: '/cart/add',  
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
@@ -181,11 +165,11 @@
                 size: selectedSize
             }),
             success: function (response) {
-                // Redirect to cart page after successfully adding to cart
+               
                 window.location.href = '/cart';
             },
             error: function (error) {
-                // Show an error message if something goes wrong
+                
                 console.error("Error adding product to cart:", error);
                 Swal.fire({
                     title: 'Error!',
@@ -202,7 +186,6 @@
         e.preventDefault()
 
         const productId = $(this).data('id')
-        console.log(productId)
 
         $.ajax({
             url: '/wishlist/add',
@@ -216,105 +199,43 @@
                 toastr.success('Product Added to Wishlist')
             },
             error: function (error) {
-                console.log('Error adding to wishlist', error)
                 toastr.error('Error adding to wishlist')
             }
         })
     })
 
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const thumbnails = document.querySelectorAll('.nav-link');
-        const lens = document.getElementById('magnifier-lens');
-        const container = document.getElementById('magnifier-container');
+    function changeImage(src) {
         const mainImage = document.getElementById('main-image');
+        mainImage.src = src;
 
-        // Set the lens dimensions and style
-        lens.style.width = "250px";
-        lens.style.height = "200px";
-        lens.style.position = "absolute";
-        lens.style.border = "1px solid #000";
-        lens.style.cursor = "none";
-        lens.style.borderRadius = '7.5px';
+        
+        mainImage.classList.remove('zoom-image');
+        setTimeout(() => {
+            mainImage.classList.add('zoom-image');
+        }, 10);
+    }
 
-        // Initialize the magnifying lens functionality
-        function initializeZoom(image) {
-            lens.style.display = 'none'; // Hide the lens initially
+    
+    const zoomContainer = document.querySelector('.zoom-container');
+    const zoomImage = document.querySelector('.zoom-image');
+    
+    zoomContainer.addEventListener('mousemove', (e) => {
+        const { left, top, width, height } = zoomContainer.getBoundingClientRect();
+        const x = e.clientX - left; 
+        const y = e.clientY - top;  
 
-            // Function to move the lens
-            function moveLens(e) {
-                const pos = getCursorPos(e, image);
-                let x = pos.x - (lens.offsetWidth / 2);
-                let y = pos.y - (lens.offsetHeight / 2);
+        const xPercent = (x / width) * 100; 
+        const yPercent = (y / height) * 100; 
 
-                // Prevent lens from going out of bounds
-                if (x > image.width - lens.offsetWidth) { x = image.width - lens.offsetWidth; }
-                if (x < 0) { x = 0; }
-                if (y > image.height - lens.offsetHeight) { y = image.height - lens.offsetHeight; }
-                if (y < 0) { y = 0; }
-
-                lens.style.left = x + "px";
-                lens.style.top = y + "px";
-                lens.style.backgroundImage = "url('" + image.src + "')";
-                lens.style.backgroundSize = (image.width * 3) + "px " + (image.height * 3) + "px";
-                lens.style.backgroundPosition = "-" + (x * 3) + "px -" + (y * 3) + "px";
-            }
-
-            function getCursorPos(e, img) {
-                const rect = img.getBoundingClientRect();
-                return {
-                    x: e.pageX - rect.left - window.pageXOffset,
-                    y: e.pageY - rect.top - window.pageYOffset
-                };
-            }
-
-            // Attach mousemove event to the image
-            container.addEventListener('mousemove', moveLens);
-            container.addEventListener('mouseleave', () => {
-                lens.style.display = 'none';
-            });
-            container.addEventListener('mouseenter', () => {
-                lens.style.display = 'block';
-            });
-        }
-
-        // Handle thumbnail click event
-        thumbnails.forEach(thumbnail => {
-            thumbnail.addEventListener('click', function () {
-                // Remove 'active' class from all tabs
-                thumbnails.forEach(tab => tab.classList.remove('active'));
-
-                // Add 'active' class to the clicked tab
-                this.classList.add('active');
-
-                // Get the target tab ID
-                const targetTabId = this.getAttribute('href');
-
-                // Hide all tab panes
-                document.querySelectorAll('.tab-pane').forEach(tabPane => {
-                    tabPane.classList.remove('active');
-                });
-
-                // Show the target tab pane
-                document.querySelector(targetTabId).classList.add('active');
-
-                // Update the main image in the active tab
-                const imgSrc = this.querySelector('.product__thumb__pic').getAttribute('data-setbg');
-                mainImage.src = imgSrc; // Update main image source
-                mainImage.setAttribute('data-large-src', imgSrc); // Update the large source if needed
-
-                // Clear existing event listeners before re-initializing zoom
-                container.replaceWith(container.cloneNode(true));
-                const newContainer = document.getElementById('magnifier-container');
-
-                // Reinitialize the zoom for the new main image
-                initializeZoom(mainImage);
-            });
-        });
-
-        // Initialize the zoom for the first image
-        initializeZoom(mainImage);
+        zoomImage.style.transformOrigin = `${xPercent}% ${yPercent}%`; 
     });
+    
+    zoomContainer.addEventListener('mouseleave', () => {
+        zoomImage.style.transformOrigin = '50% 50%'; 
+    });
+
+
+
 </script>
 
 {{> user/footer}}

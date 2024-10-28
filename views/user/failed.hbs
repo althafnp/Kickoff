@@ -1,0 +1,56 @@
+{{> user/header}}
+
+
+
+<style>
+    .failure-main-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f8d7da;
+        height: 40rem;
+    }
+    .failure-container {
+        text-align: center;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        background-color: white;
+    }
+    .failure-icon {
+        font-size: 80px;
+        color: #dc3545;
+    }
+    .failure-message {
+        font-size: 24px;
+        margin-top: 10px;
+    }
+    .btn-try-again {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: black;
+        color: #fff;
+        text-decoration: none;
+        border: 1px solid black;
+        transition: .3s ease-in-out;
+    }
+    .btn-try-again:hover {
+        background-color: white;
+        color: black;
+    }
+</style>
+
+<div class="failure-main-container">
+    <div class="failure-container">
+        <div class="failure-icon">
+            &#10060; <!-- Cross icon -->
+        </div>
+        <div class="failure-message">
+            Payment Failed!
+        </div>
+        <p class="mt-3">We're sorry, but there was an issue with your payment.</p>
+        <a href="/orders" class="btn-try-again">Try Again From The Orders Page</a>
+    </div>
+</div>
+
+{{> user/footer}}

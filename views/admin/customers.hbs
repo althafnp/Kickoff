@@ -1,82 +1,124 @@
 {{> admin/header}}
 
 
-<div class="content-header row">
-    <div class="d-flex justify-content-between align-items-center">
-        <h2 class="content-title card-title">Customers</h2>
-
-    </div>
-</div>
-</div>
-
-<header class="card-header text-center mb-20">
-    <form action="/admin/users" method="get" class="d-inline">
-        <div class="container">
-          <div class="row justify-content-center">
-            <div class="col-12 col-md-8 col-lg-6">
-              <div class="input-group input-group-sm border border-1 border-grey rounded-pill">
-                <input type="text" class="form-control border-0 rounded-pill" placeholder="Search Users" name="search"/>
-                <button class="btn" type="submit">Search</button>
-              </div>
-            </div>
-          </div>
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Customers</h2>
         </div>
-    </form>
-</header>
-<div class="right mt-5">
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col"><b>Id</b></th>
-                    <th scope="col"><b>Name</b></th>
-                    <th scope="col"><b>Email</b></th>
-                    <th scope="col"><b>Status</b></th>
-                    <th scope="col"><b>Action</b></th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each userData}}
-                <tr>
-                    <td>{{_id}}</td>
-                    <td>{{name}}</td>
-                    <td>{{email}}</td>
-                    <td>
-                        {{#if isBlocked}}
-                        <p class="text text-danger">Blocked</p>
-                        {{else}}
-                        <p class="text text-success">Active</p>
-                        {{/if}}
-                    </td>
-                    <td>
-                        {{#if isBlocked}}
-                        <a href="/admin/users/unblockUser?id={{_id}}" class="text-white" style="text-decoration: none;">
-                            <button class="btn btn-success" style="width: 80px;">Unblock</button>
-                        </a>
-                        
-                        {{else}}
-                        <a href="/admin/users/blockUser?id={{_id}}" class="text-white" style="text-decoration: none;">
-                            <button class="btn btn-danger" style="width: 80px;">Block</button>
-                        </a>
-                        {{/if}}
-                    </td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
     </div>
-</div>
-<div class="container mt-3">
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center mb-20" style="margin-right: 200px;">
-            {{#each pages}}
-            <li class="page-item {{#if (eq this ../currentPage)}} active {{/if}}">
-                <a href="?page={{this}}" class="page-link"> {{this}} </a>
-            </li>
-            {{/each}}
-        </ul>
-    </nav>
-</div>
+
+
+    <header class="card-header text-center mb-20">
+        <form action="/admin/category/" method="get" class="d-inline">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-8 col-lg-6">
+                        <div class="input-group input-group-sm border border-1 border-grey rounded-pill">
+                            <input type="text" class="form-control border-0 rounded-pill" placeholder="Search Users"
+                            name="search" />
+                            <button class="btn" type="submit">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </header>
+    <div class="right mt-5">
+        <div class="user-container">
+            <!-- Card layout for mobile -->
+            <div class="d-block d-md-none">
+                <div class="row">
+                    {{#each userData}}
+                    <div class="col-12 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">ID: {{_id}}</h5>
+                                <p class="card-text"><strong>Name:</strong> {{name}}</p>
+                                <p class="card-text"><strong>Email:</strong> {{email}}</p>
+                                <p class="card-text">
+                                    <strong>Status:</strong>
+                                    {{#if isBlocked}}
+                                    <span class="text-danger">Blocked</span>
+                                    {{else}}
+                                    <span class="text-success">Active</span>
+                                    {{/if}}
+                                </p>
+                                <div>
+                                    {{#if isBlocked}}
+                                    <a href="/admin/users/unblockUser?id={{_id}}" class="btn btn-success"
+                                        style="width: 80px;">Unblock</a>
+                                    {{else}}
+                                    <a href="/admin/users/blockUser?id={{_id}}" class="btn btn-danger"
+                                        style="width: 80px;">Block</a>
+                                    {{/if}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+
+            <!-- Table layout for larger screens -->
+            <div class="d-none d-md-block">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col"><b>Id</b></th>
+                                <th scope="col"><b>Name</b></th>
+                                <th scope="col"><b>Email</b></th>
+                                <th scope="col"><b>Status</b></th>
+                                <th scope="col"><b>Action</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each userData}}
+                            <tr>
+                                <td>{{_id}}</td>
+                                <td>{{name}}</td>
+                                <td>{{email}}</td>
+                                <td>
+                                    {{#if isBlocked}}
+                                    <p class="text-danger">Blocked</p>
+                                    {{else}}
+                                    <p class="text-success">Active</p>
+                                    {{/if}}
+                                </td>
+                                <td>
+                                    {{#if isBlocked}}
+                                    <a href="/admin/users/unblockUser?id={{_id}}" class="text-white"
+                                        style="text-decoration: none;">
+                                        <button class="btn btn-success" style="width: 80px;">Unblock</button>
+                                    </a>
+                                    {{else}}
+                                    <a href="/admin/users/blockUser?id={{_id}}" class="text-white"
+                                        style="text-decoration: none;">
+                                        <button class="btn btn-danger" style="width: 80px;">Block</button>
+                                    </a>
+                                    {{/if}}
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container mt-3" style="display: flex; justify-content: center; align-items: center">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {{#each pages}}
+                <li class="page-item {{#if (eq this ../currentPage)}} active {{/if}}">
+                    <a href="?page={{this}}" class="page-link"> {{this}} </a>
+                </li>
+                {{/each}}
+            </ul>
+        </nav>
+    </div>
+</section>
 
 
 

@@ -116,7 +116,7 @@
 
             $.ajax({
                 method: 'POST',
-                url: 'verify-otp',
+                url: 'verify-otp-reset',
                 data: {otp : otpInput},
                 success: function(response){
                     if(response.success){
@@ -159,7 +159,7 @@
 
             $.ajax({
                 method: 'POST',
-                url: 'resend-otp',
+                url: 'resend-otp-reset',
                 success: function(response){
                     if(response.success){
                         Swal.fire({
@@ -185,3 +185,4 @@
     </script>
 </body>
 </html>
+

@@ -1,15 +1,35 @@
 const Order = require('../../models/orderSchema')
 const User = require('../../models/userSchema')
+const Address = require('../../models/addressSchema')
 
 
 const loadOrderPage = async (req, res) => {
     try {
 
-        const order = await Order.find({}).sort({createdOn: -1}).populate('userId');
+        let page = 1;
+        if(req.query.page){
+            page = req.query.page;
+        }
+        const limit = 5;
 
-        // console.log('order', order)
+        const order = await Order.find({}).sort({createdOn: -1}).populate('userId')
+        .limit(limit)
+        .skip((page - 1) * limit)
 
-        res.render('order-list', {order})
+        const count = await Order.find().countDocuments()
+
+        const totalPages = Math.ceil(count / limit);
+
+        const pages = Array.from({length: totalPages}, (_, i) => i + 1)
+
+
+
+        res.render('order-list', {
+            order,
+            pages,
+            totalPages,
+            currentPage: page
+        })
     } catch (error) {
         console.log('Error loading Orders page', error)
         res.redirect('/admin/page-error')
@@ -47,7 +67,7 @@ const cancelOrder = async (req, res) => {
         const {id} = req.body;
 
         const order = await Order.findOne({orderId: id}).populate('orderedItems.product')
-        console.log(order)
+
 
         if(!order){
             return res.status(404).json({message: 'Order not Found'})
@@ -96,7 +116,6 @@ const loadReturnRequests = async (req, res) => {
     try {
 
         const returnRequests = await Order.find({ status: 'Return Request' }).populate('userId');
-
 
 
         res.render('return-requests', { returnRequests });
@@ -161,10 +180,37 @@ const processReturn = async (req, res) => {
     }
 };
 
+
+const loadOrderDetails = async (req, res) => {
+    try {
+
+        const orderId = req.params.orderId;
+
+        const order = await Order.findById(orderId).populate('orderedItems.product');
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found.' });
+        }
+
+        const userAddress = await Address.findOne({ userId: order.userId });
+
+        let usedAddress = null;
+        if (userAddress) {
+            usedAddress = userAddress.address.find(addr => addr._id.toString() === order.address.toString());
+        }
+
+        return res.render('order-detail', { order, usedAddress });
+        
+    } catch (error) {
+        console.error('Error loading Details:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+}
+
 module.exports = {
     loadOrderPage,
     changeStatus,
     cancelOrder,
     loadReturnRequests,
-    processReturn
+    processReturn,
+    loadOrderDetails
 }

@@ -13,6 +13,13 @@ router.post('/resend-otp', authController.resendOtp)
 router.get('/login', authController.loadLoginPage)
 router.post('/login', authController.login)
 
+router.get('/forgot-password', authController.loadForgotPassword)
+router.post('/forgot-password', authController.forgotPassword)
+router.post('/verify-otp-reset', authController.verifyOtpForReset)
+router.post('/resend-otp-reset', authController.resendOtpForReset)
+router.get('/reset-password', authController.loadResetPassword)
+router.post('/reset-password', authController.resetPassword)
+
 
 router.get('/google', passport.authenticate('google', {scope:['profile', 'email']}));
 router.get('/google/callback', passport.authenticate('google', {failureRedirect: '/auth/signup'}), (req, res) => {

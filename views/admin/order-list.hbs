@@ -1,71 +1,168 @@
 {{> admin/header}}
 
 
-<div class="content-header"></div>
-    <div>
-        <h2 class="content-title card-title">Orders</h2>
-    </div>
-</div>
-
-<header class="card-header text-center mb-20">
-    <form action="" method="get" class="d-inline">
-        <div class="input-group input-group-sm border border-1 border-grey rounded-pill" style="width: 500px; margin-left: 230px;">
-            <input type="text" class="form-control border-0 rounded-pill" placeholder="Search orders or customers" name="search">
-            <button class="btn border-0" type="submit">Search</button>
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Orders</h2>
         </div>
-    </form>
-</header>
+    </div>
 
-<div class="right mt-5">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col"><b>Order ID</b></th>
-                <th scope="col"><b>Customer Name</b></th>
-                <th scope="col"><b>Order Date</b></th>
-                <th scope="col"><b>Total Amount</b></th>
-                <th scope="col"><b>Status</b></th>
-                <th scope="col"><b>Action</b></th>
-                <th scope="col"><b>Change Status</b></th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each order}}
-            <tr>
-                <td>{{orderId}}</td>
-                <td>{{userId.name}}</td>
-                <td>{{formatDate createdOn}}</td>
-                <td>₹ {{finalAmount}}</td>
-                <td>{{status}}</td>
-                <td>
-                    {{#if (eq status 'Cancelled')}}
-                    {{else}}
-                    <button class="btn btn-danger" style="width: 80px" onclick="cancelOrder('{{orderId}}')">Cancel</button>
-                    {{/if}}
-                </td>
-                <td>{{#if (eq status 'Cancelled')}}
-                    {{else}}
-                    <select name="status" class="form-select" data-order-id="{{orderId}}" style="background-color: white;" onchange="changeOrderStatus(this)">
-                        <option value="Pending" {{#if (eq status 'Pending')}}selected{{/if}}>Pending</option>
-                        <option value="Processing" {{#if (eq status 'Processing')}}selected{{/if}}>Processing</option>
-                        <option value="Shipped" {{#if (eq status 'Shipped')}}selected{{/if}}>Shipped</option>
-                        <option value="Delivered" {{#if (eq status 'Delivered')}}selected{{/if}}>Delivered</option>
-                        <option value="Return Request" {{#if (eq status 'Return Request')}}selected{{/if}}>Return Request</option>
-                        <option value="Returned" {{#if (eq status 'Returned')}}selected{{/if}}>Returned</option>
-                    </select>
-                    {{/if}}
-                </td>
-            </tr>
-            {{/each}}
-        </tbody>
-    </table>
-</div>
+    <header class="card-header text-center mb-20">
+        <form action="" method="get" class="d-inline">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-8 col-lg-6">
+                        <div class="input-group input-group-sm border border-1 border-grey rounded-pill">
+                            <input type="text" class="form-control border-0 rounded-pill" placeholder="Search Orders"
+                                name="search" />
+                            <button class="btn" type="submit">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </header>
 
+    <div class="order-container">
+        <!-- Card layout for mobile -->
+        <div class="d-block d-md-none">
+            <div class="row">
+                {{#each order}}
+                <div class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Order ID: {{orderId}}</h5>
+                            <p class="card-text"><strong>Customer Name:</strong> {{userId.name}}</p>
+                            <p class="card-text"><strong>Order Date:</strong> {{formatDate createdOn}}</p>
+                            <p class="card-text"><strong>Total Amount:</strong> ₹ {{finalAmount}}</p>
+                            <p class="card-text"><strong>Status:</strong> {{status}}</p>
+                            <div class="d-flex justify-content-between">
+                                {{#if (eq status 'Cancelled')}}
+                                <span class="text-danger">Cancelled</span>
+                                {{else}}
+                                <button class="btn btn-danger" onclick="cancelOrder('{{orderId}}')" style="width: 45%;"
+                                    {{#if (or (eq status 'Delivered' ) (eq status 'Return Request' ) (eq
+                                    status 'Returned' ))}}disabled{{/if}}>
+                                    Cancel
+                                </button>
+                                {{/if}}
+                                <select name="status" class="form-select" data-order-id="{{orderId}}"
+                                    style="background-color: white; width: 45%;" onchange="changeOrderStatus(this)"
+                                    {{#if (or (eq status 'Delivered' ) (eq status 'Return Request' ) (eq
+                                    status 'Returned' ))}}disabled{{/if}}>
+                                    <option value="Pending" {{#if (eq status 'Pending' )}}selected{{/if}} {{#if (or (eq
+                                        status 'Delivered' ) (eq status 'Return Request' ) (eq status 'Returned'
+                                        ))}}disabled{{/if}}>
+                                        Pending
+                                    </option>
+                                    <option value="Delivered" {{#if (eq status 'Delivered' )}}selected{{/if}} {{#if (or
+                                        (eq status 'Return Request' ) (eq status 'Returned' ))}}disabled{{/if}}>
+                                        Delivered
+                                    </option>
+                                    <option value="Return Request" {{#if (eq status 'Return Request' )}}selected{{/if}}
+                                        disabled>
+                                        Return Request
+                                    </option>
+                                    <option value="Returned" {{#if (eq status 'Returned' )}}selected{{/if}} disabled>
+                                        Returned
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+
+        <!-- Table layout for larger screens -->
+        <div class="d-none d-md-block">
+            <div class="right mt-5">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col"><b>Order ID</b></th>
+                            <th scope="col"><b>Customer Name</b></th>
+                            <th scope="col"><b>Order Date</b></th>
+                            <th scope="col"><b>Total Amount</b></th>
+                            <th scope="col"><b>Status</b></th>
+                            <th scope="col"><b>Action</b></th>
+                            <th scope="col"><b>Change Status</b></th>
+                            <th scope="col"><b>Details</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each order}}
+                        <tr>
+                            <td>{{orderId}}</td>
+                            <td>{{userId.name}}</td>
+                            <td>{{formatDate createdOn}}</td>
+                            <td>₹ {{finalAmount}}</td>
+                            <td>{{status}}</td>
+                            <td>
+                                {{#if (eq status 'Cancelled')}}
+                                <span class="text-danger">Cancelled</span>
+                                {{else}}
+                                <button class="btn btn-danger" style="width: 80px" onclick="cancelOrder('{{orderId}}')"
+                                    {{#if (or (eq status 'Delivered' ) (eq status 'Return Request' ) (eq
+                                    status 'Returned' ))}}disabled{{/if}}>
+                                    Cancel
+                                </button>
+                                {{/if}}
+                            </td>
+                            <td>
+                                <select name="status" class="form-select" data-order-id="{{orderId}}"
+                                    style="background-color: white;" onchange="changeOrderStatus(this)" {{#if (or (eq
+                                    status 'Cancelled' ) (eq status 'Delivered' ) (eq status 'Return Request' ) (eq
+                                    status 'Returned' ))}}disabled{{/if}}>
+                                    <option value="Pending" {{#if (eq status 'Pending' )}}selected{{/if}} {{#if (or (eq
+                                        status 'Cancelled' ) (eq status 'Delivered' ) (eq status 'Return Request' ) (eq
+                                        status 'Returned' ))}}disabled{{/if}}>
+                                        Pending
+                                    </option>
+                                    <option value="Delivered" {{#if (eq status 'Delivered' )}}selected{{/if}} {{#if (or
+                                        (eq status 'Cancelled' ) (eq status 'Return Request' ) (eq status 'Returned'
+                                        ))}}disabled{{/if}}>
+                                        Delivered
+                                    </option>
+                                    <option value="Return Request" {{#if (eq status 'Return Request' )}}selected{{/if}}
+                                        {{#if (eq status 'Cancelled' )}}disabled{{/if}}>
+                                        Return Request
+                                    </option>
+                                    <option value="Returned" {{#if (eq status 'Returned' )}}selected{{/if}} disabled>
+                                        Returned
+                                    </option>
+                                </select>
+                            </td>
+                            <td>
+                                <a href="/admin/orders/details/{{_id}}" class="btn btn-primary">View</a>
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="container mt-3" style="display: flex; justify-content: center; align-items: center">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {{#each pages}}
+                <li class="page-item {{#if (eq this ../currentPage)}} active {{/if}}">
+                    <a href="?page={{this}}" class="page-link"> {{this}} </a>
+                </li>
+                {{/each}}
+            </ul>
+        </nav>
+    </div>
+
+</section>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    function changeOrderStatus(selectElement){
+    function changeOrderStatus(selectElement) {
         const status = selectElement.value;
         const orderId = selectElement.getAttribute('data-order-id');
 
@@ -73,11 +170,11 @@
         $.ajax({
             url: ('/admin/orders/changeStatus'),
             method: 'POST',
-            data : {
+            data: {
                 status: status,
                 id: orderId
             },
-            success: function(response){
+            success: function (response) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Status Updated',
@@ -88,7 +185,7 @@
                     location.reload();
                 })
             },
-            error: function(err){
+            error: function (err) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -99,7 +196,7 @@
     }
 
 
-    function cancelOrder(orderId){
+    function cancelOrder(orderId) {
         Swal.fire({
             title: 'Are You Sure?',
             text: 'You Are About to Cancel This Order',
@@ -108,12 +205,12 @@
             confirmButtonText: 'Yes, Cancel it!',
             cancelButtonText: 'No, Keep it'
         }).then((result) => {
-            if(result.isConfirmed){
+            if (result.isConfirmed) {
                 $.ajax({
                     url: '/admin/orders/cancelOrder',
                     method: 'POST',
-                    data: {id: orderId},
-                    success: function(response){
+                    data: { id: orderId },
+                    success: function (response) {
                         Swal.fire({
                             icon: 'success',
                             title: 'Cancelled!',
@@ -121,12 +218,12 @@
                             showConfirmButton: false,
                             timer: 1500
                         })
-                        .then(() => {
-                            location.reload()
-                        })
+                            .then(() => {
+                                location.reload()
+                            })
                     },
-                    error: function(error){
-                         Swal.fire({
+                    error: function (error) {
+                        Swal.fire({
                             icon: 'error',
                             title: 'Error',
                             text: 'There was an issue canceling the order.',

@@ -257,7 +257,6 @@
 <script>
 
     document.getElementById('add-variant-btn').addEventListener('click', function () {
-        console.log('req')
         const variantContainer = document.getElementById('variant-container');
         const newVariantRow = document.createElement('div');
         newVariantRow.className = 'row mb-3';
@@ -278,7 +277,7 @@
 
         // Add event listener to remove the variant row
         newVariantRow.querySelector('.remove-variant').addEventListener('click', function () {
-            console.log('remove')
+
             newVariantRow.remove();
         });
     });
@@ -286,7 +285,6 @@
 
 
     document.getElementById('category-id').addEventListener('change', async function () {
-        console.log('change')
         const categoryType = this.value;  // Get the selected category type
         if (categoryType) {
             try {
@@ -363,7 +361,6 @@
 
 function validateForm() {
    let imageDatas = false
-           console.log("validate form");
            clearErrorMessages();
            const name = document.getElementsByName('productName')[0].value;
            const description = document.getElementsByName('description')[0].value;
@@ -468,7 +465,6 @@ function viewImage1(event) {
                cropperContainer.style.display = 'block';
                let saveButton = document.querySelector('#saveButton' + index);
                saveButton.addEventListener('click', async function () {
-                console.log('save')
                    let croppedCanvas = cropper.getCroppedCanvas();
                    let croppedImage = document.getElementById("croppedImg" + index);
                    croppedImage.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
@@ -574,16 +570,6 @@ function viewImage1(event) {
 
 
 </script>
-
-
-
-
-
-
-
-
-
-
 
 
 {{> admin/footer}}

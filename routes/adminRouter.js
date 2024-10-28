@@ -15,14 +15,15 @@ const {adminAuth} = require('../middlewares/auth')
 
 
 router.get('/dashboard', adminAuth, adminController.loadDashboard);
+router.post('/salesReport', adminAuth, adminController.getSalesReport);
+router.post('/salesPdfReport', adminAuth, adminController.generateSalesPdfReport)
+router.post('/salesExcelReport', adminAuth, adminController.salesExcelReport)
+router.get('/topSelling', adminAuth, adminController.getTopSellingProducts)
 
 
 //PAGE ERROR
 router.get('/page-error', adminController.pageError);
 
-
-//MIDDLEWARE FOR ADMIN AUTHENTICATION
-// router.use(adminAuth)
 
 
 //CUSTOMERS
@@ -59,6 +60,7 @@ router.post('/removeProductOffer', adminAuth, productController.removeProductOff
 
 //ORDERS
 router.get('/orders',adminAuth, orderController.loadOrderPage)
+router.get('/orders/details/:orderId',adminAuth, orderController.loadOrderDetails)
 router.post('/orders/changeStatus', adminAuth, orderController.changeStatus)
 router.post('/orders/cancelOrder', adminAuth, orderController.cancelOrder)
 router.get('/return-requests', adminAuth, orderController.loadReturnRequests)

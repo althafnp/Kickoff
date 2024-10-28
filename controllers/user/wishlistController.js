@@ -35,7 +35,6 @@ const addWishlist = async (req, res) => {
         if(req.user){
             const userId = req.user._id;
             const {productId} = req.body
-            console.log('dfa', productId)
 
             const product = await Product.findById(productId)
 

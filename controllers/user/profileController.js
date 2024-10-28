@@ -10,10 +10,8 @@ const loadProfilePage = async (req, res) => {
         if(req.user){
 
             const user = await User.findOne({_id: req.user})
-            // console.log(user)
 
             const address = await Address.findOne({userId: req.user})
-            // console.log('address',address)
 
             return res.render('profile', {user, address})
         }else{
@@ -65,7 +63,6 @@ const addAddress = async (req, res) => {
     try {
         
         let address = await Address.findOne({userId});
-        console.log('address',address);
         
         if(!address){
             address = new Address({userId, address: []});
@@ -146,17 +143,14 @@ const deleteAddress = async (req, res) => {
 const changePassword = async (req, res) => {
     try {
 
-        console.log(req.body)
 
         const userId = req.user._id;
 
         const {currentPassword, newPassword} = req.body;
 
         const user = await User.findById(userId);
-        console.log('user', user);
         
         const isMatch = await bcrypt.compare(currentPassword, user.password);
-        console.log(isMatch)
         if(!isMatch){
             return res.status(400).json({success: false, message: 'The Password is Incorrect'})
         }

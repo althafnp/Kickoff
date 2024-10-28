@@ -11,6 +11,13 @@ const loadCartPage = async (req, res) => {
 
             const cart = await Cart.findOne({userId: userId, }).populate('items.productId');
 
+            const blockedItems = cart.items.filter(item => item.productId.isBlocked);
+
+            if (blockedItems.length > 0) {
+                cart.items = cart.items.filter(item => !item.productId.isBlocked);
+                await cart.save();
+            }
+
             if(!cart || cart.items.length === 0){
                 return res.render('cart', { user: req.user, items: [], message: 'Your Cart is Empty'})
             }
@@ -37,8 +44,8 @@ const addCart = async (req, res) => {
             const userId = req.user._id;
 
             const product = await Product.findById(productId);
-            if(!product){
-                return res.status(404).json({error: 'Product not found'})
+            if(!product || product.isBlocked == 'true'){
+                return res.status(404).json({error: 'Product not found Or Currently Unavailable'})
             }
 
             const variant = product.variant.find(v => v.size == size);
@@ -107,7 +114,16 @@ const updateCart = async (req, res) => {
         if(!item){
             return res.status(404).json({success: false, message: 'Item not found in cart'})
         }
-        console.log('item', item.productId.productName)
+
+
+        const product = item.productId
+        
+        const variant = product.variant.find(v => v.size == item.size)
+
+        if (quantity > variant.stock) {
+            return res.status(400).json({ success: false, message: `Not enough stock for ${product.productName} (Size: ${variant.size}). Available: ${variant.stock}` });
+        }
+        
 
         item.quantity = quantity;
         item.totalPrice = item.productId.salePrice * quantity;

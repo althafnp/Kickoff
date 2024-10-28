@@ -1,6 +1,24 @@
 {{> user/header}}
 
+<style>
+    .button {
+        width: 8rem;
+        height: 2rem;
+        background-color: #000;
+        color: #fff;
+        letter-spacing: 1px;
+        border: 1px solid #000;
+        border-radius: 2px;
+        margin-top: 10px;
+        transition: .3s ease-in-out;
+    }
 
+    .button:hover {
+        background-color: #fff;
+        color: #000;
+        cursor: pointer;
+    }
+</style>
 
 <!-- Breadcrumb Section Begin -->
 <section class="breadcrumb-option">
@@ -69,25 +87,38 @@
                 </div>
                 <div class="col-lg-4 col-md-6">
                     <div class="cart__discount">
-                        <h4>Coupon codes</h4>
+                        <h4 style="color: green;">Available Coupon Codes</h4>
+                        <ul style="list-style: none;">
+                            {{#each coupons}}
+                            <li>Code: {{code}} <span style="margin-left: 100px;">Discount: {{couponOffer}}%</span></li>
+                            {{/each}}
+                        </ul>
+                        <a href="/coupons"><button type="button" class="button">View Details</button></a>
+                    </div>
+                    <div class="cart__discount">
+                        <h4>Coupon Codes</h4>
                         <form action="">
                             <input type="text" id="couponCode" name="couponCode" placeholder="Enter coupon code">
                             <button type="button" onclick="applyCoupon()">Apply</button>
                         </form>
+                        <div style="margin-top: 8px">
+                            <button id="removeCoupon" class="btn btn-outline-danger btn-sm" onclick="removeCoupon()" style="display: none">Remove Coupon</button>
+                        </div>
                     </div>
                     <div id="couponMessage"></div>
                     <div class="checkout__order">
                         <h4 class="order__title">Your order</h4>
-                        <div class="checkout__order__products">Product <span>Total</span></div>
-                        <ul class="checkout__total__products">
-                            {{#each cart.items}}
-                            <li>{{productId.productName}} (x{{quantity}}) <span>₹ {{totalPrice}}</span></li>
-                            {{/each}}
-                        </ul>
-                        <ul class="checkout__total__all">
-                            <li>Delivery Charge <span>₹ <span id="deliveryCharge">40</span></span></li>
-                            <li>Total <span id="total">₹ 0</span></li>
-                        </ul>
+                        <div class="checkout__order__products">Product <span>Total</span>
+                            <ul class="checkout__total__products">
+                                {{#each cart.items}}
+                                <li>{{productId.productName}} (x{{quantity}}) <span>₹ {{totalPrice}}</span></li>
+                                {{/each}}
+                            </ul>
+                            <ul class="checkout__total__all">
+                                <li>Delivery Charge <span>₹ <span id="deliveryCharge">40</span></span></li>
+                                <li>Total <span id="total">₹ 0</span></li>
+                            </ul>
+                        </div>
 
                         <h6 class="checkout__title">Payment Method</h6>
                         <div class="checkout__payment__methods">
@@ -266,7 +297,8 @@
     });
     const deliveryCharge = 40;
     const finalTotal = totalPrice + deliveryCharge;
-    console.log(finalTotal)
+    var couponRemovePrice = finalTotal;
+
 
     document.getElementById('total').innerText = `₹ ${finalTotal}`;
     document.getElementById('deliveryCharge').innerText = `${deliveryCharge}`;
@@ -299,9 +331,8 @@
             if(response.ok){
                 document.getElementById('total').innerText = `₹ ${result.newTotal}`;
 
-                document.getElementById('couponMessage').innerHTML = `
-                <p style="color: green; font-weight: bold;">${result.message}</p>
-                `
+                document.getElementById('couponMessage').innerHTML = `<p style="color: green; font-weight: bold;">${result.message}</p>`
+                document.getElementById('removeCoupon').style.display = 'block';
             }
             else{
                 document.getElementById('couponMessage').innerHTML = `<p style="color:red;">${result.message}</p>`;
@@ -314,17 +345,33 @@
         }
     }
 
+    function removeCoupon() {
+        let couponInput = document.getElementById('couponCode');
+        if(couponInput){
+            couponInput.value = '';
+        }
+        document.getElementById('total').innerText = `₹ ${couponRemovePrice}`
+
+        document.getElementById('couponMessage').innerHTML = `<p style="color: green;">Coupon Removed Successfully.</p>`;
+        document.getElementById('removeCoupon').style.display = 'none';
+
+    }
+
+
+
 
     document.getElementById('placeOrderBtn').addEventListener('click', async () => {
         const selectedAddressElement = document.querySelector('input[name="address"]:checked');
         const paymentMethodElement = document.querySelector('input[name="paymentMethod"]:checked');
-        const couponCode = document.getElementById('couponCode').value.toUpperCase() || null;
+        const couponCode = document.getElementById('couponCode').value.toUpperCase().trim() || null;
+        const finalTotalText = document.getElementById('total').innerText;
+
+        const finalTotal = parseFloat(finalTotalText.replace(/[₹, ]/g, ''));
 
 
         document.getElementById('addressMessage').innerHTML = ''
         document.getElementById('paymentMessage').innerHTML = ''
 
-        console.log(couponCode)
 
         if (!selectedAddressElement) {
             document.getElementById('addressMessage').innerHTML = '<p style="color:red;">Please select an address.</p>';
@@ -339,7 +386,10 @@
         const selectedAddress = selectedAddressElement.value;
         const paymentMethod = paymentMethodElement.value;
 
-
+        if (paymentMethod === 'COD' && finalTotal > 1000) {
+            document.getElementById('paymentMessage').innerHTML = '<p style="color:red;">Cash on delivery is not allowed for orders above ₹1000.</p>';
+            return;
+        }
 
 
 
@@ -406,10 +456,22 @@
                         },
                         theme: {
                             color: '#3399cc'
+                        },
+                        modal: {
+                            ondismiss: function() {
+                                // Handle the case where the user closes the Razorpay modal
+                                window.location.href = '/payment-failed?orderId=' + result.orderId;
+                            }
                         }
-                    }
+                    };
 
                     const razorpay = new Razorpay(options);
+
+                    razorpay.on('payment.failed', function (response) {
+                        // Redirect to payment failed page
+                        window.location.href = '/payment-failed?orderId=' + result.orderId;
+                    });
+
                     razorpay.open();
                 }
                 else {
@@ -511,7 +573,6 @@
                 alert("Address ID is missing. Cannot update the address.");
                 return;
             }
-            // Prepare the data to be sent
             const data = {
                 addressId: addressId,
                 name: $('#editName').val(),
@@ -523,7 +584,6 @@
                 pincode: $('#editPinCode').val(),
             };
 
-            // Send the AJAX request to update the address
             $.ajax({
                 url: '/editAddress',
                 method: 'PUT',
@@ -560,10 +620,9 @@
             const pincode = $('#pinCode').val();
             const userId = $('#userId').val()
 
-            // Validate required fields
+
             if (name && phone && houseNo && city && landmark && state && pincode) {
-                console.log(name)
-                // AJAX request to save the address
+
                 $.ajax({
                     url: '/addAddress',
                     method: 'POST',

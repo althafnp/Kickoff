@@ -41,12 +41,16 @@ router.get('/checkout/:cartId', userAuth, checkoutController.loadCheckoutPage)
 router.post('/checkout/place-order', userAuth, checkoutController.placeOrder)
 router.post('/checkout/capture-payment', userAuth, checkoutController.capturePayment)
 router.get('/order-success', userAuth, checkoutController.orderSuccess)
+router.get('/payment-failed', userAuth, checkoutController.paymentFailure)
+router.post('/orders/continue-payment/:orderId', userAuth, checkoutController.continuePayment)
+
 
 //ORDERS
 router.get('/orders', userAuth, orderController.loadOrdersPage)
 router.post('/orders/cancel/:orderId', userAuth, orderController.cancelOrder)
 router.get('/orders/details/:orderId', userAuth, orderController.orderDetails)
 router.post('/orders/return-request', userAuth, orderController.requestReturn)
+router.get('/download-invoice/:orderId', userAuth, orderController.downloadInvoice)
 
 
 

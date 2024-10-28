@@ -7,10 +7,33 @@ const loadCouponPage = async (req, res) => {
 
         if(req.user){
 
+            const page = parseInt(req.query.page) || 1;
+            const limit = 5;
+            const skip = (page - 1) * limit;
+
+            const totalCoupons = await Coupon.countDocuments({status: 'Active'})
+
+
+
             const user = await User.findOne({_id: req.user})
             const coupon = await Coupon.find({status: 'Active'})
+            .sort({createdAt: -1})
+            .skip(skip)
+            .limit(limit)
 
-            res.render('coupons', {coupon, user: req.user})
+            const totalPages = Math.ceil(totalCoupons / limit);
+
+            
+
+
+
+            res.render('coupons', {
+                coupon,
+                user: req.user,
+                currentPage: page,
+                totalPages,
+                totalCoupons
+                })
         }
         else{
             res.redirect('/auth/login')

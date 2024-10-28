@@ -3,14 +3,44 @@
 
 
     <style>
-        * {
-            margin: 0;
+        .container-fluid {
             padding: 0;
-            box-sizing: border-box;
         }
-        body{
-            overflow-x: hidden;
+        .hero-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
         }
+        .view-section {
+            height: 10rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+        }
+        .inner-div {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px; 
+        }
+        .image-div {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        img {
+            width: 100%; 
+            height: 100%;
+            object-fit: cover;
+        }
+        
         .collection {
             color: red;
             font-size: medium;
@@ -53,69 +83,77 @@
             height: 10rem;
         }
 
-        .img {
-            display: flex;
-            justify-content: flex-end;
-            align-items: flex-end;
-        }
+        @media (max-width: 767px) {
+            .hero-section {
+                flex-direction: column;
+                height: auto;
+            }
 
-        .home-img {
-            height: 100vh !important;
-            max-width: 100%;
+            .inner-div, .image-div {
+                width: 100%;
+            }
+
+            .image-div img {
+                width: 100%;
+                height: auto;
+            }
+
+            .view-more {
+                margin-top: 20px;
+                width: 100%;
+            }
         }
     </style>
 
-    <section>
-        <div class="row align-items-center">
-            <div class="col-md-6 text-center">
-                <div class="contents">
-                    <p class="collection">2024-2025 COLLECTION</p>
-                    <h2 class="name">FC BARCELONA</h2>
-                    <p class="available">Available Now!</p>
-                    <a href="/shop"><button class="btn">SHOP NOW</button></a>
-                </div>
+    <div class="container-fluid">
+        <!-- FC Barcelona Section -->
+        <div class="row no-gutters hero-section">
+            <div class="col-12 col-md-7 inner-div">
+                <p class="collection">2024-2025 COLLECTION</p>
+                <h2 class="name">FC BARCELONA</h2>
+                <p class="available">Available Now!</p>
+                <a href="/shop"><button class="btn">SHOP NOW</button></a>
             </div>
-            <div class="col-md-6 img">
-                <img class="home-img" src="/images/Barcelona-home-cover.jpeg" alt="">
-            </div>
-        </div>
-    </section>
-
-    <section>
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <img class="home-img" src="/images/Realmadrid-home-cover.jpeg" alt="">
-            </div>
-            <div class="col-md-6 text-center">
-                <div class="contents">
-                    <p class="collection">2024-2025 COLLECTION</p>
-                    <h2 class="name">REAL MADRID</h2>
-                    <p class="available">Available Now!</p>
-                    <a href="/shop"><button class="btn">SHOP NOW</button></a>
-                </div>
+            <div class="col-12 col-md-5 image-div">
+                <img src="/images/Barcelona-home-cover.jpeg" alt="FC Barcelona Jersey">
             </div>
         </div>
-    </section>
 
-    <section>
-        <div class="row align-items-center">
-            <div class="col-md-6 text-center">
-                <div class="contents">
-                    <p class="collection">2024-2025 COLLECTION</p>
-                    <h2 class="name">MANCHESTER CITY</h2>
-                    <p class="available">Available Now!</p>
-                    <a href="/shop"><button class="btn">SHOP NOW</button></a>
-                </div>
+        <!-- Real Madrid Section -->
+        <div class="row no-gutters hero-section">
+            <div class="col-12 col-md-5 image-div">
+                <img src="/images/Realmadrid-home-cover.jpeg" alt="Real Madrid Jersey">
             </div>
-            <div class="col-md-6 img">
-                <img class="home-img" src="/images/Mancity-home-cover.jpeg" alt="">
+            <div class="col-12 col-md-7 inner-div">
+                <p class="collection">2024-2025 COLLECTION</p>
+                <h2 class="name">REAL MADRID</h2>
+                <p class="available">Available Now!</p>
+                <a href="/shop"><button class="btn">SHOP NOW</button></a>
             </div>
         </div>
-    </section>
 
-    <div class="view-more text-center">
-        <a href="/shop"><button class="btn">VIEW MORE</button></a>
+        <!-- Manchester City Section -->
+        <div class="row no-gutters hero-section">
+            <div class="col-12 col-md-7 inner-div">
+                <p class="collection">2024-2025 COLLECTION</p>
+                <h2 class="name">MANCHESTER CITY</h2>
+                <p class="available">Available Now!</p>
+                <a href="/shop"><button class="btn">SHOP NOW</button></a>
+            </div>
+            <div class="col-12 col-md-5 image-div">
+                <img src="/images/Mancity-home-cover.jpeg" alt="Manchester City Jersey">
+            </div>
+        </div>
+        <div class="row no-gutters view-section">
+            <div class="view-more text-center">
+                <a href="/shop"><button class="btn">VIEW MORE</button></a>
+            </div>
+        </div>
+        
     </div>
+
+
+    
 
 
 {{> user/footer}}

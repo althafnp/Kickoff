@@ -26,10 +26,57 @@
         border: 1px solid #ddd;
         margin: 0 5px;
     }
+
     .toast-warning {
-    background-color: #ffc107 !important; /* Typical warning color */
-    color: #black !important; /* Text color */
+        background-color: #ffc107 !important;
+        /* Typical warning color */
+        color: #black !important;
+        /* Text color */
     }
+
+    /* Default styles for desktop/tablet */
+.desktop-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.desktop-table th, .desktop-table td {
+    padding: 15px;
+    text-align: left;
+}
+
+/* Styles for mobile screens */
+.mobile-card {
+    display: none; /* Hide by default */
+}
+
+.card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.product__cart__item__pic img {
+    max-width: 100%;
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    .desktop-table {
+        display: none; /* Hide table on mobile */
+    }
+    .mobile-card {
+        display: block; /* Show card layout on mobile */
+    }
+}
 </style>
 
 <!-- Breadcrumb Section Begin -->
@@ -62,7 +109,7 @@
                 </div>
                 {{else}}
                 <div class="shopping__cart__table">
-                    <table>
+                    <table class="desktop-table">
                         <thead>
                             <tr>
                                 <th>Product</th>
@@ -88,7 +135,7 @@
                                         <div class="custom-pro-qty">
                                             <span class="custom-dec custom-qtybtn" data-id="{{_id}}">-</span>
                                             <input type="text" class="custom-cart-quantity" data-id="{{_id}}" min="1"
-                                                value="{{quantity}}">
+                                                value="{{quantity}}" disabled>
                                             <span class="custom-inc custom-qtybtn" data-id="{{_id}}">+</span>
                                         </div>
                                     </div>
@@ -103,11 +150,41 @@
                             {{/each}}
                         </tbody>
                     </table>
+
+                    <div class="mobile-card">
+                        {{#each items}}
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="product__cart__item__pic">
+                                    <img src="/uploads/re-image/{{this.productId.productImage.[0]}}" alt="">
+                                </div>
+                                <div class="product__cart__item__text">
+                                    <h6>{{productId.productName}} - ({{size}})</h6>
+                                    <h6>₹ {{productId.salePrice}}</h6>
+                                </div>
+                                <div class="custom-quantity">
+                                    <div class="custom-pro-qty">
+                                        <span class="custom-dec custom-qtybtn" data-id="{{_id}}">-</span>
+                                        <input type="text" class="custom-cart-quantity" data-id="{{_id}}" min="1"
+                                            value="{{quantity}}" disabled>
+                                        <span class="custom-inc custom-qtybtn" data-id="{{_id}}">+</span>
+                                    </div>
+                                </div>
+                                <div class="cart__price" data-id="{{_id}}">₹ {{totalPrice}}</div>
+                                <div class="cart__close">
+                                    <a href="/cart/remove/{{productId._id}}?size={{size}}" class="remove-item">
+                                        <i class="fa fa-close"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
                 </div>
                 {{/if}}
                 <div class="row">
                     <div class="col-lg-6 col-md-6 col-sm-6">
-                        <div class="continue__btn">
+                        <div class="continue__btn" style="margin-bottom: 2rem;">
                             <a href="/shop">Continue Shopping</a>
                         </div>
                     </div>
@@ -116,6 +193,10 @@
             <div class="col-lg-4">
                 {{#if items.length}}
                 <div class="cart__total">
+                    <h6>Cart total</h6>
+                    <ul>
+                        <li class="cart-total">Total <span>₹ </span></li>
+                    </ul>
                     <a href="/checkout/{{cart._id}}" class="primary-btn" id="checkout">Proceed to checkout</a>
                 </div>
                 {{else}}
@@ -133,6 +214,8 @@
 <script>
 
 
+    document.addEventListener('DOMContentLoaded', calculateTotal);
+
     $(document).ready(function () {
         // Increment button
         $('.custom-inc').on('click', function () {
@@ -140,11 +223,11 @@
             let quantity = parseInt(input.val());
             const itemId = input.data('id');
 
-            if(quantity < 10){
+            if (quantity < 10) {
                 quantity++;
                 input.val(quantity);
                 updateCartQuantity(itemId, quantity); // Call the AJAX function to update the quantity in the backend
-            }else{
+            } else {
                 toastr.warning('Quantity is limited for 10')
             }
         });
@@ -174,17 +257,35 @@
                 success: function (response) {
                     if (response.success) {
                         const totalPrice = response.newTotalPrice;
-                         $(`.cart__price[data-id="${itemId}"]`).text(`₹ ${totalPrice}`);
+                        $(`.cart__price[data-id="${itemId}"]`).text(`₹ ${totalPrice}`);
+                        calculateTotal()
                     } else {
                         alert(response.message);
                     }
                 },
                 error: function (error) {
-                    toastr.error('Error updating quantity');
+                    toastr.error(error.responseJSON.message);
                 }
             });
         }
     });
+
+    function calculateTotal() {
+        let total = 0;
+
+        // Select all price cells with the class cart__price
+        const priceCells = document.querySelectorAll('.cart__price');
+
+        priceCells.forEach(cell => {
+            const priceText = cell.innerText.replace('₹ ', ''); // Remove the currency symbol
+            const price = parseFloat(priceText); // Convert to float
+            total += price; // Add to total
+        });
+
+        // Update the total price display
+        const totalDisplay = document.querySelector('.cart-total');
+        totalDisplay.innerHTML = `Total <span>₹ ${total.toFixed(2)}</span>`;
+    }
 </script>
 
 

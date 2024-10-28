@@ -23,6 +23,7 @@ const login = async (req, res) => {
         if(admin){
             const passwordMatch = await bcrypt.compare(password, admin.password);
             if(passwordMatch){
+                req.session.adminId = admin._id
                 req.session.admin = true;
                 return res.redirect('/admin/dashboard')
             }
@@ -54,7 +55,7 @@ const logout = async (req, res) => {
         })
 
     } catch (error) {
-        console.log('Admin logout error');
+        console.log('Admin logout error', error);
         res.status(500).send('Server error');
     }
 }

@@ -16,14 +16,17 @@ const categoryInfo = async (req, res) => {
 
 
 
-        const totalCategories = await Category.countDocuments();
-        const totalPages = Math.ceil(totalCategories / limit);
+        const count = await Category.countDocuments();
+        const totalPages = Math.ceil(count / limit);
+
+        const pages = Array.from({length: totalPages}, (_, i) => i + 1)
+
 
         res.render('category', {
-            currentPage: page,
-            totalPages: totalPages,
-            totalCategories: totalCategories,
-            categories
+            categories,
+            pages,
+            totalPages,
+            currentPage: page
         });
 
         
@@ -37,10 +40,9 @@ const categoryInfo = async (req, res) => {
 
 const addCategory = async (req, res) => {
     const {categoryType, name} = req.body;
-    console.log(categoryType, name)
     try {
 
-        const existingClubOrNation = await Category.findOne({name});
+        const existingClubOrNation = await Category.findOne({name: {$regex: new RegExp(`^${name}$`, 'i')}});
 
         if(existingClubOrNation){
             return res.status(400).json({error: 'Club or Nation already exist'})
@@ -118,7 +120,7 @@ const editCategory = async (req, res) => {
         const id = req.params.id;
 
       
-        const existingClubOrNation = await Category.findOne({ name });
+        const existingClubOrNation = await Category.findOne({ name: {$regex: new RegExp(`^${name}$`, 'i')} });
 
         if (existingClubOrNation) {
             return res.status(400).json({ error: 'Club or Nation already exists' });
