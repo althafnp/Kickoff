@@ -59,6 +59,10 @@ const addAddress = async (req, res) => {
     else if(pincode.length !== 6){
         return res.json({error: 'Pincode must be 6 '})
     }
+    else if(isNaN(houseNo) || houseNo.trim() === ''){
+        return res.json({error: 'House number should be a valid Number'})
+    }
+
 
     try {
         
@@ -97,6 +101,9 @@ const editAddress = async (req, res) => {
     }
     else if(pincode.length !== 6){
         return res.json({error: 'Pincode must be of 6'})
+    }
+    else if(isNaN(houseNo) || houseNo.trim() === ''){
+        return res.json({error: 'House number should be a valid Number'})
     }
 
     try {

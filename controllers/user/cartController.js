@@ -10,6 +10,10 @@ const loadCartPage = async (req, res) => {
             const userId = req.user._id;
 
             const cart = await Cart.findOne({userId: userId, }).populate('items.productId');
+            if(!cart || cart.items.length === 0){
+                return res.render('cart', { user: req.user, items: [], message: 'Your Cart is Empty'})
+            }
+
 
             const blockedItems = cart.items.filter(item => item.productId.isBlocked);
 
@@ -18,10 +22,7 @@ const loadCartPage = async (req, res) => {
                 await cart.save();
             }
 
-            if(!cart || cart.items.length === 0){
-                return res.render('cart', { user: req.user, items: [], message: 'Your Cart is Empty'})
-            }
-
+            
         
             return res.render('cart', {user: req.user, cart, items: cart.items})
         }

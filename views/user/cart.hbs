@@ -271,21 +271,22 @@
     });
 
     function calculateTotal() {
-        let total = 0;
+    let total = 0;
 
-        // Select all price cells with the class cart__price
-        const priceCells = document.querySelectorAll('.cart__price');
+    const priceCells = document.querySelectorAll('.cart__price');
+    const halfLength = Math.floor(priceCells.length / 2);
 
-        priceCells.forEach(cell => {
-            const priceText = cell.innerText.replace('₹ ', ''); // Remove the currency symbol
-            const price = parseFloat(priceText); // Convert to float
-            total += price; // Add to total
-        });
+    priceCells.forEach((cell, index) => {
+        if (index < halfLength) {
+            const priceText = cell.innerText.replace('₹ ', '');
+            const price = parseFloat(priceText);
+            total += price;
+        }
+    });
 
-        // Update the total price display
-        const totalDisplay = document.querySelector('.cart-total');
-        totalDisplay.innerHTML = `Total <span>₹ ${total.toFixed(2)}</span>`;
-    }
+    const totalDisplay = document.querySelector('.cart-total');
+    totalDisplay.innerHTML = `Total <span>₹ ${total.toFixed(2)}</span>`;
+}
 </script>
 
 

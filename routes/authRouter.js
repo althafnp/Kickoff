@@ -22,7 +22,7 @@ router.post('/reset-password', authController.resetPassword)
 
 
 router.get('/google', passport.authenticate('google', {scope:['profile', 'email']}));
-router.get('/google/callback', passport.authenticate('google', {failureRedirect: '/auth/signup'}), (req, res) => {
+router.get('/google/callback', passport.authenticate('google', {failureRedirect: '/auth/signup'}), (req, res) => {                                                                                                                                                
     req.session.user = req.user._id;
     if (req.session.user){
         res.redirect('/');

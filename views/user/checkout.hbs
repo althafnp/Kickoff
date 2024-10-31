@@ -570,9 +570,10 @@
 
             const addressId = $('#editAddressId').val();
             if (!addressId) {
-                alert("Address ID is missing. Cannot update the address.");
+                toastr.error("Address ID is missing. Cannot update the address.");
                 return;
             }
+            // Prepare the data to be sent
             const data = {
                 addressId: addressId,
                 name: $('#editName').val(),
@@ -584,25 +585,30 @@
                 pincode: $('#editPinCode').val(),
             };
 
-            $.ajax({
-                url: '/editAddress',
-                method: 'PUT',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function (response) {
-                    if (response.success) {
-                        alert('Address updated successfully');
-                        $('#editAddressModal').modal('hide');
-                        window.location.reload();
-                    } else {
-                        alert('Error updating address');
+            if (data.name && data.phone && data.houseNo && data.city && data.landmark && data.state && data.pincode) {
+                // Send the AJAX request to update the address
+                $.ajax({
+                    url: '/editAddress',
+                    method: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('Address updated successfully');
+                            $('#editAddressModal').modal('hide');
+                            window.location.reload();
+                        } else {
+                            toastr.error(response.error);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error('AJAX error:', textStatus, errorThrown, jqXHR.responseText);
+                        toastr.error('An error occurred while updating the address');
                     }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    console.error('AJAX error:', textStatus, errorThrown, jqXHR.responseText);
-                    alert('An error occurred while updating the address');
-                }
-            });
+                });
+            } else {
+                toastr.warning('Please fill the required fields')
+            }
         });
     });
 
@@ -638,7 +644,7 @@
                     },
                     success: function (response) {
                         if (response.success) {
-                            alert('Address saved successfully!');
+                            toastr.success('Address saved successfully!');
 
                             $('#addAddressModal').modal('hide');
 
@@ -646,16 +652,16 @@
 
                             window.location.reload();
                         } else {
-                            alert('Error saving the address.');
+                            toastr.error(response.error);
                         }
                     },
                     error: function (error) {
                         console.error('Error:', error);
-                        alert('An error occurred. Please try again.');
+                        toastr.error('An error occurred. Please try again.');
                     }
                 });
             } else {
-                alert('Please fill in all required fields.');
+                toastr.warning('Please fill in all required fields.');
             }
         });
     });
